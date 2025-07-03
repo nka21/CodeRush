@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "aaron-bond.better-comments", // コメントの色付け
+        "oderwat.indent-rainbow", // インデントの色付け
+    ]
+}
