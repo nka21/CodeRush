@@ -1,0 +1,47 @@
+{
+  "rooms": {
+    "AX8G-2B4K": {
+      "roomId": "AX8G-2B4K",
+      "hostId": "user_abc123",
+      "settings": {
+        "difficulty": "Normal",
+        "language": "Python"
+      },
+      "players": {
+        "user_abc123": { "name": "Player 1", "score": 0, "isReady": true },
+        "user_def456": { "name": "Player 2", "score": 0, "isReady": false }
+      },
+      "gameState": "waiting",
+      "createdAt": "2025-07-05T22:30:00Z"
+    },
+    "CYBER-PUNK": {
+      "roomId": "CYBER-PUNK",
+      "hostId": "user_ghi789",
+      "settings": {
+        "difficulty": "Hard",
+        "language": "JavaScript"
+      },
+      "players": {
+        "user_ghi789": { "name": "Host-Master", "score": 0, "isReady": true },
+        "user_jkl012": { "name": "Challenger", "score": 0, "isReady": true },
+        "user_mno345": { "name": "Rookie", "score": 0, "isReady": true }
+      },
+      "gameState": "playing",
+      "currentQuestion": 3,
+      "createdAt": "2025-07-05T22:35:10Z"
+    },
+    "EASY-GAME": {
+      "roomId": "EASY-GAME",
+      "hostId": "user_pqr678",
+      "settings": {
+        "difficulty": "Easy",
+        "language": "Random"
+      },
+      "players": {
+        "user_pqr678": { "name": "GameMaster", "score": 0, "isReady": true }
+      },
+      "gameState": "waiting",
+      "createdAt": "2025-07-05T22:40:25Z"
+    }
+  }
+}
