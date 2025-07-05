@@ -1,0 +1,218 @@
+# OpenAPI/Swaggerのバージョン
+openapi: 3.0.0
+
+# APIの基本情報
+info:
+  title: "Code Rush API"
+  description: "早押しクイズゲーム「Code Rush」のAPI仕様書"
+  version: "1.0.0"
+
+# APIサーバーの情報
+servers:
+  - url: "http://localhost:8080/v1"
+    description: "ローカル開発環境"
+
+# APIエンドポイントの定義
+paths:
+  # /rooms エンドポイント
+  /rooms:
+    post:
+      tags:
+        - Room
+      summary: "新しいルームを作成する"
+      description: "新しいゲームルームを作成し、データベースに保存します。ルームIDが未指定の場合はサーバーが自動生成します。"
+      requestBody:
+        description: "ルーム作成に必要な情報"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreationRequest'
+      responses:
+        '201':
+          description: "ルーム作成成功。作成されたルームの完全な情報を返します。"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          description: "リクエストが不正です（例: 必須項目が不足、ルームIDが既に使用されている）"
+        '500':
+          description: "サーバー内部エラー"
+
+  # /rooms/{roomId} エンドポイント
+  /rooms/{roomId}:
+    get:
+      tags:
+        - Room
+      summary: "指定したIDのルーム情報を取得する"
+      description: "ルームIDに一致する単一のルーム情報を取得します。"
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: "取得したいルームのID"
+          schema:
+            type: string
+            example: "AX8G-2B4K"
+      responses:
+        '200':
+          description: "ルーム情報取得成功"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          description: "指定されたIDのルームが見つかりません"
+        '500':
+          description: "サーバー内部エラー"
+    delete:
+      tags:
+        - Room
+      summary: "ルームを破棄する"
+      description: "指定したIDのルームをデータベースから削除します。ゲーム終了後やホストが退出した場合に呼び出されることを想定しています。原則としてホストのみが実行可能です。"
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: "破棄したいルームのID"
+          schema:
+            type: string
+            example: "AX8G-2B4K"
+      responses:
+        '204':
+          description: "ルームの削除に成功しました。レスポンスボディはありません。"
+        '403':
+          description: "権限がありません（例: ホスト以外のユーザーが削除しようとした）"
+        '404':
+          description: "指定されたIDのルームが見つかりません"
+        '500':
+          description: "サーバー内部エラー"
+
+  # /rooms/{roomId}/join エンドポイント
+  /rooms/{roomId}/join:
+    post:
+      tags:
+        - Room
+      summary: "ルームに参加する"
+      description: "既存のルームにゲストとして参加します。成功すると、参加者リストに自身が追加されたルーム情報が返されます。"
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: "参加したいルームのID"
+          schema:
+            type: string
+            example: "AX8G-2B4K"
+      requestBody:
+        description: "参加者の情報"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinRequest'
+      responses:
+        '200':
+          description: "ルーム参加成功。更新されたルーム情報を返します。"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          description: "リクエストが不正です（例: プレイヤー名が空）"
+        '404':
+          description: "指定されたIDのルームが見つかりません"
+        '409':
+          description: "参加に失敗しました（例: ゲームが既に開始している、ルームが満員）"
+        '500':
+          description: "サーバー内部エラー"
+
+# 再利用可能なコンポーネントの定義
+components:
+  schemas:
+    # ルーム作成リクエストのスキーマ
+    RoomCreationRequest:
+      type: object
+      properties:
+        roomId:
+          type: string
+          description: "ユーザーが指定したいルームID。未指定の場合はサーバーが生成します。"
+          example: "MY-ROOM-123"
+        settings:
+          $ref: '#/components/schemas/Settings'
+      required:
+        - settings
+
+    # ルーム参加リクエストのスキーマ
+    JoinRequest:
+      type: object
+      properties:
+        playerName:
+          type: string
+          description: "ルーム内で使用する表示名"
+          example: "Challenger"
+      required:
+        - playerName
+
+    # ルーム全体のスキーマ
+    Room:
+      type: object
+      properties:
+        roomId:
+          type: string
+          description: "ルームの一意なID"
+          readOnly: true
+          example: "AX8G-2B4K"
+        hostId:
+          type: string
+          description: "ルームを作成したホストのユーザーID"
+          readOnly: true
+          example: "user_abc123"
+        settings:
+          $ref: '#/components/schemas/Settings'
+        players:
+          type: object
+          description: "参加しているプレイヤーのマップ。キーはユーザーIDです。"
+          additionalProperties:
+            $ref: '#/components/schemas/Player'
+        gameState:
+          type: string
+          description: "ゲームの現在の状態"
+          readOnly: true
+          example: "waiting"
+        createdAt:
+          type: string
+          format: date-time
+          description: "ルームの作成日時"
+          readOnly: true
+          example: "2025-07-05T22:30:00Z"
+
+    # ゲーム設定のスキーマ
+    Settings:
+      type: object
+      properties:
+        difficulty:
+          type: string
+          enum: [Easy, Normal, Hard]
+          example: Normal
+        language:
+          type: string
+          enum: [C, Python, JavaScript, Java, Ruby, Go, TypeScript, Random]
+          example: Python
+
+    # プレイヤーのスキーマ
+    Player:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "プレイヤーの表示名"
+          example: "Player 1"
+        score:
+          type: integer
+          description: "現在のスコア"
+          example: 0
+        isReady:
+          type: boolean
+          description: "準備完了状態"
+          example: true
