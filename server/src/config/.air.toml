@@ -1,0 +1,27 @@
+
+# config/.air.toml
+
+# ===== 基本設定 =====
+root = "."                        # 実行時のカレントディレクトリが backend/src の場合
+tmp_dir = "tmp"
+include_ext = ["go"]
+exclude_dir = ["tmp"]
+
+# ===== ビルド設定 =====
+[build]
+cmd = "go build -o tmp/main ./cmd/route"
+bin = "tmp/main"
+full_bin = "tmp/main"
+log = "stdout"
+include = ["."]
+exclude = ["tmp", "vendor", "node_modules"]
+delay = 1000
+
+[log]
+time = true
+
+[color]
+main = "yellow"
+watcher = "cyan"
+build = "green"
+runner = "magenta"
