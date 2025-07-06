@@ -5,21 +5,21 @@ package repository
 import (
 	"errors"
 	"server/src/internal/database"
-	"server/src/internal/feature/quiz/types"
+	"server/src/internal/feature/room/types"
 )
 
 // QuizRepository はルームデータへのアクセスを担当します。
-type QuizRepository struct {
+type RoomRepository struct {
 	db *database.DBHandler
 }
 
 // NewQuizRepository は新しいリポジトリインスタンスを生成します。
-func NewQuizRepository(db *database.DBHandler) *QuizRepository {
-	return &QuizRepository{db: db}
+func NewRoomRepository(db *database.DBHandler) *RoomRepository {
+	return &RoomRepository{db: db}
 }
 
 // CreateRoom は新しいルームをDBに保存します。
-func (r *QuizRepository) CreateRoom(room *types.Room) (*types.Room, error) {
+func (r *RoomRepository) CreateRoom(room *types.Room) (*types.Room, error) {
 	db, err := r.db.ReadDB()
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (r *QuizRepository) CreateRoom(room *types.Room) (*types.Room, error) {
 }
 
 // FindRoomByID はIDでルームを検索します。
-func (r *QuizRepository) FindRoomByID(id string) (*types.Room, error) {
+func (r *RoomRepository) FindRoomByID(id string) (*types.Room, error) {
 	db, err := r.db.ReadDB()
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (r *QuizRepository) FindRoomByID(id string) (*types.Room, error) {
 }
 
 // DeleteRoom はIDでルームを削除します。
-func (r *QuizRepository) DeleteRoom(id string) error {
+func (r *RoomRepository) DeleteRoom(id string) error {
 	db, err := r.db.ReadDB()
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (r *QuizRepository) DeleteRoom(id string) error {
 }
 
 // UpdateRoom は既存のルーム情報を更新します。
-func (r *QuizRepository) UpdateRoom(room *types.Room) (*types.Room, error) {
+func (r *RoomRepository) UpdateRoom(room *types.Room) (*types.Room, error) {
 	db, err := r.db.ReadDB()
 	if err != nil {
 		return nil, err

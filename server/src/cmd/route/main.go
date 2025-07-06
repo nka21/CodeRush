@@ -5,7 +5,7 @@ package main
 import (
 	"log"
 
-	"server/src/internal/feature/quiz"
+	"server/src/internal/feature/room"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -17,7 +17,7 @@ func main() {
 	api := e.Group("/api")
 
 	// 各機能のルート登録
-	quiz.RegisterRoutes(api.Group("/room"))
+	room.RegisterRoutes(api.Group("/room"))
 
 	// ミドルウェアの設定
 	e.Use(middleware.Logger())

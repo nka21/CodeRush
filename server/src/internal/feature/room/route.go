@@ -1,9 +1,9 @@
-package quiz
+package room
 
 import (
-	"server/src/internal/feature/quiz/handler"
-	"server/src/internal/feature/quiz/repository"
-	"server/src/internal/feature/quiz/service"
+	"server/src/internal/feature/room/handler"
+	"server/src/internal/feature/room/repository"
+	"server/src/internal/feature/room/service"
 	"server/src/internal/database"
 
 
@@ -17,9 +17,9 @@ func RegisterRoutes(g *echo.Group) {
 	if err != nil {
 		log.Fatalf("DB 初期化失敗: %v", err)
 	}
-	repo := repository.NewQuizRepository(db);
-	svc := service.NewQuizService(repo)
-	h := handler.NewQuizHandler(svc)
+	repo := repository.NewRoomRepository(db);
+	svc := service.NewRoomService(repo)
+	h := handler.NewRoomHandler(svc)
 
 	// --- ルート定義 ---
 	g.POST("", h.CreateRoom)

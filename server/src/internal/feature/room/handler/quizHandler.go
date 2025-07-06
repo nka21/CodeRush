@@ -5,23 +5,23 @@ package handler
 import (
 	"net/http"
 
-	"server/src/internal/feature/quiz/service"
-	"server/src/internal/feature/quiz/types"
+	"server/src/internal/feature/room/service"
+	"server/src/internal/feature/room/types"
 	"github.com/labstack/echo/v4"
 )
 
 // QuizHandler はHTTPリクエストを対応するサービスロジックにルーティングします。
-type QuizHandler struct {
-	service *service.QuizService
+type RoomHandler struct {
+	service *service.RoomService
 }
 
 // NewQuizHandler は新しいハンドラインスタンスを生成します。
-func NewQuizHandler(s *service.QuizService) *QuizHandler {
-	return &QuizHandler{service: s}
+func NewRoomHandler(s *service.RoomService) *RoomHandler {
+	return &RoomHandler{service: s}
 }
 
 // CreateRoom は POST /rooms のリクエストを処理します。
-func (h *QuizHandler) CreateRoom(c echo.Context) error {
+func (h *RoomHandler) CreateRoom(c echo.Context) error {
 	req := new(types.RoomCreationRequest)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, types.ErrorResponse{Message: "Invalid request body"})
@@ -35,7 +35,7 @@ func (h *QuizHandler) CreateRoom(c echo.Context) error {
 }
 
 // GetRoom は GET /rooms/:id のリクエストを処理します。
-func (h *QuizHandler) GetRoom(c echo.Context) error {
+func (h *RoomHandler) GetRoom(c echo.Context) error {
 	id := c.Param("id")
 	room, err := h.service.GetRoom(id)
 	if err != nil {
@@ -45,7 +45,7 @@ func (h *QuizHandler) GetRoom(c echo.Context) error {
 }
 
 // DeleteRoom は DELETE /rooms/:id のリクエストを処理します。
-func (h *QuizHandler) DeleteRoom(c echo.Context) error {
+func (h *RoomHandler) DeleteRoom(c echo.Context) error {
 	id := c.Param("id")
 	// 本来は認証ミドルウェアから取得する
 	userID := "user_temp_host_id" // 仮のホストID
@@ -65,7 +65,7 @@ func (h *QuizHandler) DeleteRoom(c echo.Context) error {
 }
 
 // JoinRoom は POST /rooms/:id/join のリクエストを処理します。
-func (h *QuizHandler) JoinRoom(c echo.Context) error {
+func (h *RoomHandler) JoinRoom(c echo.Context) error {
 	id := c.Param("id")
 	req := new(types.JoinRequest)
 	if err := c.Bind(req); err != nil {

@@ -7,22 +7,22 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"server/src/internal/feature/quiz/repository"
-	"server/src/internal/feature/quiz/types"
+	"server/src/internal/feature/room/repository"
+	"server/src/internal/feature/room/types"
 )
 
 // QuizService はクイズ機能のビジネスロジックを担当します。
-type QuizService struct {
-	repo *repository.QuizRepository
+type RoomService struct {
+	repo *repository.RoomRepository
 }
 
 // NewQuizService は新しいサービスインスタンスを生成します。
-func NewQuizService(repo *repository.QuizRepository) *QuizService {
-	return &QuizService{repo: repo}
+func NewRoomService(repo *repository.RoomRepository) *RoomService {
+	return &RoomService{repo: repo}
 }
 
 // CreateRoom はルーム作成のロジックを処理します。
-func (s *QuizService) CreateRoom(req *types.RoomCreationRequest) (*types.Room, error) {
+func (s *RoomService) CreateRoom(req *types.RoomCreationRequest) (*types.Room, error) {
 	roomID := req.RoomID
 	if roomID == "" {
 		roomID = generateRandomID()
@@ -46,12 +46,12 @@ func (s *QuizService) CreateRoom(req *types.RoomCreationRequest) (*types.Room, e
 }
 
 // GetRoom はルーム情報を取得します。
-func (s *QuizService) GetRoom(id string) (*types.Room, error) {
+func (s *RoomService) GetRoom(id string) (*types.Room, error) {
 	return s.repo.FindRoomByID(id)
 }
 
 // DeleteRoom はルームを削除します。
-func (s *QuizService) DeleteRoom(id, userID string) error {
+func (s *RoomService) DeleteRoom(id, userID string) error {
 	room, err := s.repo.FindRoomByID(id)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (s *QuizService) DeleteRoom(id, userID string) error {
 }
 
 // JoinRoom はゲストがルームに参加するロジックを処理します。
-func (s *QuizService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, error) {
+func (s *RoomService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, error) {
 	room, err := s.repo.FindRoomByID(id)
 	if err != nil {
 		return nil, err

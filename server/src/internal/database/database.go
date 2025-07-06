@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"os"
 	"sync"
-	"server/src/internal/feature/quiz/types"
+	"server/src/internal/feature/room/types"
 )
 
 // DBHandler はJSONファイルへの読み書きを安全に行うためのハンドラです。
