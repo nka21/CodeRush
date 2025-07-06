@@ -1,21 +1,26 @@
+import { useState } from "react";
 
-export const MakeRoomButton = ({onClick}: {onClick: () => void}) => {
-    return (
-        <button 
-        onClick={onClick}
-        type="button"
-        className="text-[35px] bg-gray-500 hover:bg-gray-800 text-white font-medium py-10 px-30 rounded-md shadow-sm transition-colors duration-400">
-            作成
-        </button>
-    );
-}
+type ButtonVariant = "作成" | "参加";
 
-export const JoinRoomButton = ({onClick}: {onClick: () => void}) => {
-    return (
-        <button 
-        onClick={onClick}
-        className="cursor-pointer bg-gray-500 text-[35px] hover:bg-gray-800 text-white font-medium py-10 px-30 rounded-md shadow-sm transition-colors duration-400">
-            参加
-        </button>
-    );
-}
+type ButtonProps = {
+  onClick: () => void;
+  variant: ButtonVariant;
+};
+
+export const RoomButton = (props: ButtonProps) => {
+  const { onClick, variant } = props;
+  const [hover, setHover] = useState(false);
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      type="button"
+      style={{ boxShadow: hover ? "none" : "0 7px #f5f5dc" }}
+      className="relative cursor-pointer rounded-md bg-gray-500 px-[120px] py-10 text-[35px] font-medium text-white transition-colors duration-400 hover:[top:7px] hover:bg-gray-800"
+    >
+      {variant}
+    </button>
+  );
+};
