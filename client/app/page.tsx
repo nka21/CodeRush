@@ -1,103 +1,100 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import { RoomButton } from "./_components/RoomButton"
+import { Modal } from "./_components/Modal";
+
+type Difficulty = "easy" | "normal" | "hard";
 
 export default function Home() {
-  return (
-    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-[family-name:var(--font-geist-sans)] sm:p-20">
-      <main className="row-start-2 flex flex-col items-center gap-[32px] sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-center font-[family-name:var(--font-geist-mono)] text-sm/6 sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="rounded bg-black/[.05] px-1 py-0.5 font-[family-name:var(--font-geist-mono)] font-semibold dark:bg-white/[.06]">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [modal, setModal] = useState<string | null>(null);
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent px-4 text-sm font-medium transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="flex h-10 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-4 text-sm font-medium transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:w-auto sm:px-5 sm:text-base md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [selectedDifficulty, setSelectedDifficulty] = useState<
+    Difficulty
+  >("normal");
+  const [selectedGenre, setSelectedGenre] = useState<string>("C");
+
+  return (
+    <div className="text-center">
+      <h1 className="mb-8 py-25 text-7xl font-bold">Code Rush!</h1>
+      <div className="flex items-center justify-center gap-20">
+        <RoomButton onClick={() => setModal("make")} variant="作成" />
+        <RoomButton onClick={() => setModal("join")} variant="参加"/>
+      </div>
+
+      <Modal isOpen={modal === "make"} onClose={() => setModal(null)}>
+        <h2 className="mb-4 text-2xl font-bold">部屋を作成します</h2>
+        <p className="mb-2">
+          新しい対戦部屋を作成します。難易度とジャンルを選んでください。
+        </p>
+
+        {/* 難易度選択 */}
+        <p className="mt-4 mb-2">難易度を選択：</p>
+        <div className="mb-6 flex justify-center gap-4">
+          {["easy", "normal", "hard"].map((level) => (
+            <button
+              key={level}
+              onClick={() =>
+                setSelectedDifficulty(level as "easy" | "normal" | "hard")
+              }
+              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                selectedDifficulty === level
+                  ? "bg-blue-600 text-white"
+                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {level.charAt(0).toUpperCase() + level.slice(1)}
+            </button>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* ジャンル選択 */}
+        <p className="mb-2">ジャンルを選択：</p>
+        <div className="mb-6 flex flex-wrap justify-center gap-3">
+          {["C", "Python", "Java", "Go", "JavaScript", "C++", "C#"].map(
+            (genre) => (
+              <button
+                key={genre}
+                onClick={() => setSelectedGenre(genre)}
+                className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                  selectedGenre === genre
+                    ? "bg-green-600 text-white"
+                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {genre}
+              </button>
+            ),
+          )}
+        </div>
+
+        {/* 決定ボタン */}
+        <button
+          onClick={() => {
+            console.log("部屋作成: 難易度 =", selectedDifficulty);
+            console.log("ジャンル =", selectedGenre);
+            setModal(null);
+          }}
+          className="mt-6 rounded-md bg-blue-500 px-4 py-2 text-white"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          決定
+        </button>
+      </Modal>
+
+      <Modal isOpen={modal === "join"} onClose={() => setModal(null)}>
+        <h2 className="mb-4 text-2xl font-bold">部屋に参加します</h2>
+        <p>参加コードを入力してください。</p>
+        <input
+          type="text"
+          className="mt-2 w-full rounded-md border-2 border-gray-300 p-2"
+          placeholder="例: ABCD"
+        />
+        <button
+          onClick={() => setModal(null)}
+          className="mt-6 rounded-md bg-green-500 px-4 py-2 text-white"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          参加
+        </button>
+      </Modal>
     </div>
   );
 }
