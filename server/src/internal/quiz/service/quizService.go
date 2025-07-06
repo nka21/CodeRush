@@ -1,1 +1,93 @@
+// backend/src/internal/feature/quiz/service/service.go
+// ビジネスロジックの実装
 package service
+
+import (
+	"crypto/rand"
+	"errors"
+	"fmt"
+	"time"
+	"server/src/internal/quiz/repository"
+	"server/src/internal/quiz/types"
+)
+
+// QuizService はクイズ機能のビジネスロジックを担当します。
+type QuizService struct {
+	repo *repository.QuizRepository
+}
+
+// NewQuizService は新しいサービスインスタンスを生成します。
+func NewQuizService(repo *repository.QuizRepository) *QuizService {
+	return &QuizService{repo: repo}
+}
+
+// CreateRoom はルーム作成のロジックを処理します。
+func (s *QuizService) CreateRoom(req *types.RoomCreationRequest) (*types.Room, error) {
+	roomID := req.RoomID
+	if roomID == "" {
+		roomID = generateRandomID()
+	}
+
+	// 本来は認証情報から取得するが、今回は仮のIDを使用
+	hostID := "user_" + generateRandomID()
+
+	newRoom := &types.Room{
+		RoomID:    roomID,
+		HostID:    hostID,
+		Settings:  req.Settings,
+		Players:   make(map[string]types.Player),
+		GameState: "waiting",
+		CreatedAt: time.Now().UTC(),
+	}
+	// ホストをプレイヤーとして追加
+	newRoom.Players[hostID] = types.Player{Name: "Host", Score: 0, IsReady: true}
+
+	return s.repo.CreateRoom(newRoom)
+}
+
+// GetRoom はルーム情報を取得します。
+func (s *QuizService) GetRoom(id string) (*types.Room, error) {
+	return s.repo.FindRoomByID(id)
+}
+
+// DeleteRoom はルームを削除します。
+func (s *QuizService) DeleteRoom(id, userID string) error {
+	room, err := s.repo.FindRoomByID(id)
+	if err != nil {
+		return err
+	}
+	// ホストのみが削除可能というビジネスルール
+	if room.HostID != userID {
+		return errors.New("only the host can delete the room")
+	}
+	return s.repo.DeleteRoom(id)
+}
+
+// JoinRoom はゲストがルームに参加するロジックを処理します。
+func (s *QuizService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, error) {
+	room, err := s.repo.FindRoomByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if room.GameState != "waiting" {
+		return nil, errors.New("game has already started")
+	}
+
+	// 本来は認証情報から取得するが、今回は仮のIDを使用
+	playerID := "user_" + generateRandomID()
+	if _, exists := room.Players[playerID]; exists {
+		return nil, errors.New("user already in room")
+	}
+
+	room.Players[playerID] = types.Player{Name: req.PlayerName, Score: 0, IsReady: false}
+
+	return s.repo.UpdateRoom(room)
+}
+
+// generateRandomID はランダムなIDを生成するヘルパー関数
+func generateRandomID() string {
+	b := make([]byte, 8)
+	rand.Read(b)
+	return fmt.Sprintf("%x", b)
+}

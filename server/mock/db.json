@@ -1,47 +1,55 @@
 {
   "rooms": {
-    "AX8G-2B4K": {
-      "roomId": "AX8G-2B4K",
-      "hostId": "user_abc123",
+    "42": {
+      "roomId": "42",
+      "hostId": "user_59799649e3cc30d9",
       "settings": {
         "difficulty": "Normal",
         "language": "Python"
       },
       "players": {
-        "user_abc123": { "name": "Player 1", "score": 0, "isReady": true },
-        "user_def456": { "name": "Player 2", "score": 0, "isReady": false }
+        "user_59799649e3cc30d9": {
+          "name": "Host",
+          "score": 0,
+          "isReady": true
+        }
       },
       "gameState": "waiting",
-      "createdAt": "2025-07-05T22:30:00Z"
+      "createdAt": "2025-07-06T03:59:54.876077792Z"
     },
-    "CYBER-PUNK": {
-      "roomId": "CYBER-PUNK",
-      "hostId": "user_ghi789",
+    "42tokyo": {
+      "roomId": "42tokyo",
+      "hostId": "user_825db69f979eadf9",
       "settings": {
-        "difficulty": "Hard",
-        "language": "JavaScript"
+        "difficulty": "Normal",
+        "language": "Python"
       },
       "players": {
-        "user_ghi789": { "name": "Host-Master", "score": 0, "isReady": true },
-        "user_jkl012": { "name": "Challenger", "score": 0, "isReady": true },
-        "user_mno345": { "name": "Rookie", "score": 0, "isReady": true }
-      },
-      "gameState": "playing",
-      "currentQuestion": 3,
-      "createdAt": "2025-07-05T22:35:10Z"
-    },
-    "EASY-GAME": {
-      "roomId": "EASY-GAME",
-      "hostId": "user_pqr678",
-      "settings": {
-        "difficulty": "Easy",
-        "language": "Random"
-      },
-      "players": {
-        "user_pqr678": { "name": "GameMaster", "score": 0, "isReady": true }
+        "user_825db69f979eadf9": {
+          "name": "Host",
+          "score": 0,
+          "isReady": true
+        }
       },
       "gameState": "waiting",
-      "createdAt": "2025-07-05T22:40:25Z"
+      "createdAt": "2025-07-06T04:00:50.75321808Z"
+    },
+    "AWS": {
+      "roomId": "AWS",
+      "hostId": "user_8178db337ea2a3d1",
+      "settings": {
+        "difficulty": "Normal",
+        "language": "Python"
+      },
+      "players": {
+        "user_8178db337ea2a3d1": {
+          "name": "Host",
+          "score": 0,
+          "isReady": true
+        }
+      },
+      "gameState": "waiting",
+      "createdAt": "2025-07-06T04:01:26.383468001Z"
     }
   }
 }
