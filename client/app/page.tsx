@@ -1,16 +1,16 @@
 "use client";
 import { useState } from "react";
-import { RoomButton } from "./_components/RoomButton"
+import { RoomButton } from "./_components/RoomButton";
 import { Modal } from "./_components/Modal";
 
-type Difficulty = "Easy" | "Normal" | "Hard";
+const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"] as const;
+type Difficulty = (typeof DIFFICULTY_LEVELS)[number];
 
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<
-    Difficulty
-  >("Normal");
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<Difficulty>("Normal");
   const [selectedGenre, setSelectedGenre] = useState<string>("C");
 
   return (
@@ -18,7 +18,7 @@ export default function Home() {
       <h1 className="mb-8 py-25 text-7xl font-bold">Code Rush!</h1>
       <div className="flex items-center justify-center gap-20">
         <RoomButton onClick={() => setModal("make")} variant="作成" />
-        <RoomButton onClick={() => setModal("join")} variant="参加"/>
+        <RoomButton onClick={() => setModal("join")} variant="参加" />
       </div>
 
       <Modal isOpen={modal === "make"} onClose={() => setModal(null)}>
@@ -30,7 +30,7 @@ export default function Home() {
         {/* 難易度選択 */}
         <p className="mt-4 mb-2">難易度を選択：</p>
         <div className="mb-6 flex justify-center gap-4">
-          {["Easy", "Normal", "Hard"].map((level) => (
+          {DIFFICULTY_LEVELS.map((level) => (
             <button
               key={level}
               onClick={() =>
