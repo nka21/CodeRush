@@ -1,5 +1,5 @@
-name: チケット作成用
-description: 目的と完了条件を記述するテンプレート
+name: "チケット作成用"
+description: "目的と完了条件を記述するテンプレート"
 title: ""
 labels: []
 body:
