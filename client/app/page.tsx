@@ -34,7 +34,7 @@ export default function Home() {
             <button
               key={level}
               onClick={() =>
-                setSelectedDifficulty(level as "Easy" | "Normal" | "Hard")
+                setSelectedDifficulty(level as Difficulty)
               }
               className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
                 selectedDifficulty === level
