@@ -8,6 +8,9 @@
     // フロントエンド
     "esbenp.prettier-vscode", // Prettier
     "bradlc.vscode-tailwindcss", // Tailwind CSS
-    "formulahendry.auto-close-tag" // HTMLの閉じタグの自動入力
+    "formulahendry.auto-close-tag", // HTMLの閉じタグの自動入力
+
+    // バックエンド
+    "golang.go" // Go
   ]
 }
