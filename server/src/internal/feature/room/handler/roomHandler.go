@@ -79,7 +79,7 @@ func (h *RoomHandler) JoinRoom(c echo.Context) error {
 
 	room, err := h.service.JoinRoom(id, req)
 	if err != nil {
-		if err.Error() == "room not found" {
+		if errors.Is(err, service.ErrRoomNotFound) {
 			return c.JSON(http.StatusNotFound, types.ErrorResponse{Message: err.Error()})
 		}
 		return c.JSON(http.StatusConflict, types.ErrorResponse{Message: err.Error()})

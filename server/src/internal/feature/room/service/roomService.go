@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"server/src/internal/feature/room/utils"
 	"server/src/internal/feature/room/repository"
 	"server/src/internal/feature/room/types"
 )
@@ -54,7 +55,10 @@ func (s *RoomService) GetRoom(id string) (*types.Room, error) {
 func (s *RoomService) DeleteRoom(id, userID string) error {
 	room, err := s.repo.FindRoomByID(id)
 	if err != nil {
-		return err
+		if errors.Is(err, utils.ErrRoomNotFound) {
+			return fmt.Errorf("%w", utils.ErrRoomNotFound) // ← ラップする
+		}
+		return err // その他のエラー
 	}
 	// ホストのみが削除可能というビジネスルール
 	if room.HostID != userID {
@@ -88,7 +92,6 @@ func (s *RoomService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, 
 // generateRandomID はランダムなIDを生成するヘルパー関数
 func generateRandomID() string {
 	b := make([]byte, 8)
-	rand.Read(b)
 	if _, err := rand.Read(b); err != nil {
 		fmt.Printf("Error generating random ID: %v\n", err)
 		return ""

@@ -4,6 +4,7 @@ package repository
 
 import (
 	"errors"
+	"server/src/internal/feature/room/utils"
 	"server/src/internal/database"
 	"server/src/internal/feature/room/types"
 )
@@ -45,8 +46,8 @@ func (r *RoomRepository) FindRoomByID(id string) (*types.Room, error) {
 	}
 
 	room, exists := db.Rooms[id]
-	if !exists {
-		return nil, errors.New("room not found")
+	if !exists{
+		return nil, utils.ErrRoomNotFound
 	}
 	return &room, nil
 }

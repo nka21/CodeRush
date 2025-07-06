@@ -17,7 +17,7 @@ func RegisterRoutes(g *echo.Group) {
 	if err != nil {
 		log.Fatalf("DB 初期化失敗: %v", err)
 	}
-	repo := repository.NewRoomRepository(db);
+	repo := repository.NewRoomRepository(db)
 	svc := service.NewRoomService(repo)
 	h := handler.NewRoomHandler(svc)
 
