@@ -1,0 +1,39 @@
+name: タスク
+description: 目的と完了条件を記述するテンプレート
+title: "[タスク] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎯 目的
+
+        このIssueの目的を明確にしてください。
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: このIssueで達成したい目的・背景・Whyなどを書いてください。
+      placeholder: 例）ユーザー登録時のエラー表示を明確にしてUXを向上させたい
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## ✅ 完了条件
+
+        完了とみなせる具体的な条件をチェックリスト形式で記述してください。
+
+  - type: textarea
+    id: done-criteria
+    attributes:
+      label: 完了条件
+      description: タスクが完了したと判断できる条件をリストアップしてください（チェックボックス形式）。
+      placeholder: |
+        - [ ] APIからのレスポンスにエラーメッセージを含める
+        - [ ] フロントでエラー表示を実装する
+        - [ ] テストで正常系・異常系をカバーする
+    validations:
+      required: true
