@@ -1,24 +1,35 @@
 "use client";
 import { useState } from "react";
-import { RoomButton } from "./_components/RoomButton"
+import { RoomButton } from "./_components/RoomButton";
 import { Modal } from "./_components/Modal";
 
-type Difficulty = "easy" | "normal" | "hard";
+const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"] as const;
+type Difficulty = (typeof DIFFICULTY_LEVELS)[number];
+
+const QUIZ_LANGUAGES = [
+  "C",
+  "Python",
+  "Java",
+  "Go",
+  "JavaScript",
+  "C++",
+  "C#",
+] as const;
+type QuizLanguage = (typeof QUIZ_LANGUAGES)[number];
 
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<
-    Difficulty
-  >("normal");
-  const [selectedGenre, setSelectedGenre] = useState<string>("C");
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<Difficulty>("Normal");
+  const [selectedGenre, setSelectedGenre] = useState<QuizLanguage>("C");
 
   return (
     <div className="text-center">
       <h1 className="mb-8 py-25 text-7xl font-bold">Code Rush!</h1>
       <div className="flex items-center justify-center gap-20">
         <RoomButton onClick={() => setModal("make")} variant="作成" />
-        <RoomButton onClick={() => setModal("join")} variant="参加"/>
+        <RoomButton onClick={() => setModal("join")} variant="参加" />
       </div>
 
       <Modal isOpen={modal === "make"} onClose={() => setModal(null)}>
@@ -30,19 +41,17 @@ export default function Home() {
         {/* 難易度選択 */}
         <p className="mt-4 mb-2">難易度を選択：</p>
         <div className="mb-6 flex justify-center gap-4">
-          {["easy", "normal", "hard"].map((level) => (
+          {DIFFICULTY_LEVELS.map((level) => (
             <button
               key={level}
-              onClick={() =>
-                setSelectedDifficulty(level as "easy" | "normal" | "hard")
-              }
+              onClick={() => setSelectedDifficulty(level as Difficulty)}
               className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
                 selectedDifficulty === level
                   ? "bg-blue-600 text-white"
                   : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
+              {level}
             </button>
           ))}
         </div>
@@ -50,21 +59,19 @@ export default function Home() {
         {/* ジャンル選択 */}
         <p className="mb-2">ジャンルを選択：</p>
         <div className="mb-6 flex flex-wrap justify-center gap-3">
-          {["C", "Python", "Java", "Go", "JavaScript", "C++", "C#"].map(
-            (genre) => (
-              <button
-                key={genre}
-                onClick={() => setSelectedGenre(genre)}
-                className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                  selectedGenre === genre
-                    ? "bg-green-600 text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {genre}
-              </button>
-            ),
-          )}
+          {QUIZ_LANGUAGES.map((language) => (
+            <button
+              key={language}
+              onClick={() => setSelectedGenre(language)}
+              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                selectedGenre === language
+                  ? "bg-green-600 text-white"
+                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {language}
+            </button>
+          ))}
         </div>
 
         {/* 決定ボタン */}
