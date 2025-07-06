@@ -6,12 +6,23 @@ import { Modal } from "./_components/Modal";
 const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"] as const;
 type Difficulty = (typeof DIFFICULTY_LEVELS)[number];
 
+const QUIZ_LANGUAGES = [
+  "C",
+  "Python",
+  "Java",
+  "Go",
+  "JavaScript",
+  "C++",
+  "C#",
+] as const;
+type QuizLanguage = (typeof QUIZ_LANGUAGES)[number];
+
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
 
   const [selectedDifficulty, setSelectedDifficulty] =
     useState<Difficulty>("Normal");
-  const [selectedGenre, setSelectedGenre] = useState<string>("C");
+  const [selectedGenre, setSelectedGenre] = useState<QuizLanguage>("C");
 
   return (
     <div className="text-center">
@@ -33,9 +44,7 @@ export default function Home() {
           {DIFFICULTY_LEVELS.map((level) => (
             <button
               key={level}
-              onClick={() =>
-                setSelectedDifficulty(level as Difficulty)
-              }
+              onClick={() => setSelectedDifficulty(level as Difficulty)}
               className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
                 selectedDifficulty === level
                   ? "bg-blue-600 text-white"
@@ -50,21 +59,19 @@ export default function Home() {
         {/* ジャンル選択 */}
         <p className="mb-2">ジャンルを選択：</p>
         <div className="mb-6 flex flex-wrap justify-center gap-3">
-          {["C", "Python", "Java", "Go", "JavaScript", "C++", "C#"].map(
-            (genre) => (
-              <button
-                key={genre}
-                onClick={() => setSelectedGenre(genre)}
-                className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                  selectedGenre === genre
-                    ? "bg-green-600 text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {genre}
-              </button>
-            ),
-          )}
+          {QUIZ_LANGUAGES.map((language) => (
+            <button
+              key={language}
+              onClick={() => setSelectedGenre(language)}
+              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                selectedGenre === language
+                  ? "bg-green-600 text-white"
+                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {language}
+            </button>
+          ))}
         </div>
 
         {/* 決定ボタン */}
