@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { RoomButton } from "./RoomButton"
-import {Modal} from "./Modal";
+import { RoomButton } from "./_components/RoomButton"
+import {Modal} from "./_components/Modal";
 
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
