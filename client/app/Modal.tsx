@@ -11,7 +11,10 @@ type ModalProps = {
   children: ReactNode; // モーダルの中身を外部から受け取る
 };
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export const Modal = (props: ModalProps) => {
+
+  const { isOpen, onClose, children } = props;
+
   // isOpenがfalseの場合は何もレンダリングしない
   if (!isOpen) {
     return null;
