@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
 import { RoomButton } from "./_components/RoomButton"
-import {Modal} from "./_components/Modal";
+import { Modal } from "./_components/Modal";
+
+type Difficulty = "easy" | "normal" | "hard";
 
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<
-    "easy" | "normal" | "hard"
+    Difficulty
   >("normal");
   const [selectedGenre, setSelectedGenre] = useState<string>("C");
 

@@ -1,14 +1,12 @@
 // Modal.tsx
-
 'use client';
 
-import { ReactNode } from 'react';
 
 // Propsの型を定義
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  children: ReactNode; // モーダルの中身を外部から受け取る
+  children: React.ReactNode; // モーダルの中身を外部から受け取る
 };
 
 export const Modal = (props: ModalProps) => {
