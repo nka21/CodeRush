@@ -4,6 +4,7 @@ package handler
 
 import (
 	"net/http"
+	"errors"
 
 	"server/src/internal/feature/room/service"
 	"server/src/internal/feature/room/types"
@@ -53,13 +54,14 @@ func (h *RoomHandler) DeleteRoom(c echo.Context) error {
 	err := h.service.DeleteRoom(id, userID)
 	if err != nil {
 		// エラーの種類によってステータスコードを分ける
-		if err.Error() == "room not found" {
+		switch {
+		case errors.Is(err, service.ErrRoomNotFound):
 			return c.JSON(http.StatusNotFound, types.ErrorResponse{Message: err.Error()})
-		}
-		if err.Error() == "only the host can delete the room" {
+		case errors.Is(err, service.ErrNotHostPermission):
 			return c.JSON(http.StatusForbidden, types.ErrorResponse{Message: err.Error()})
+		default:
+			return c.JSON(http.StatusInternalServerError, types.ErrorResponse{Message: err.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, types.ErrorResponse{Message: err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
 }

@@ -89,5 +89,9 @@ func (s *RoomService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, 
 func generateRandomID() string {
 	b := make([]byte, 8)
 	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		fmt.Printf("Error generating random ID: %v\n", err)
+		return ""
+	}
 	return fmt.Sprintf("%x", b)
 }
