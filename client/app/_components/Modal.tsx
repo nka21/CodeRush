@@ -26,7 +26,7 @@ export const Modal = (props: ModalProps) => {
     >
       {/* モーダル本体 */}
       <div
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md relative bordborder-black-500"
+        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md relative border border-black-500"
         onClick={(e) => e.stopPropagation()} // モーダル内のクリックが背景に伝播しないようにする
       >
         {/* 閉じるボタン */}
