@@ -1,6 +1,13 @@
 {
-    "recommendations": [
-        "aaron-bond.better-comments", // コメントの色付け
-        "oderwat.indent-rainbow", // インデントの色付け
-    ]
+  "recommendations": [
+    // 共通
+    "aaron-bond.better-comments", // コメントの色付け
+    "oderwat.indent-rainbow", // インデントの色付け
+    "PKief.material-icon-theme", // ファイルアイコンの変更
+
+    // フロントエンド
+    "esbenp.prettier-vscode", // Prettier
+    "bradlc.vscode-tailwindcss", // Tailwind CSS
+    "formulahendry.auto-close-tag" // HTMLの閉じタグの自動入力
+  ]
 }
