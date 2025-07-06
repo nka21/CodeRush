@@ -3,14 +3,14 @@ import { useState } from "react";
 import { RoomButton } from "./_components/RoomButton"
 import { Modal } from "./_components/Modal";
 
-type Difficulty = "easy" | "normal" | "hard";
+type Difficulty = "Easy" | "Normal" | "Hard";
 
 export default function Home() {
   const [modal, setModal] = useState<string | null>(null);
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<
     Difficulty
-  >("normal");
+  >("Normal");
   const [selectedGenre, setSelectedGenre] = useState<string>("C");
 
   return (
@@ -30,11 +30,11 @@ export default function Home() {
         {/* 難易度選択 */}
         <p className="mt-4 mb-2">難易度を選択：</p>
         <div className="mb-6 flex justify-center gap-4">
-          {["easy", "normal", "hard"].map((level) => (
+          {["Easy", "Normal", "Hard"].map((level) => (
             <button
               key={level}
               onClick={() =>
-                setSelectedDifficulty(level as "easy" | "normal" | "hard")
+                setSelectedDifficulty(level as "Easy" | "Normal" | "Hard")
               }
               className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
                 selectedDifficulty === level
@@ -42,7 +42,7 @@ export default function Home() {
                   : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
+              {level}
             </button>
           ))}
         </div>
