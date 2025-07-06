@@ -5,8 +5,8 @@ package handler
 import (
 	"net/http"
 
-	"server/src/internal/quiz/service"
-	"server/src/internal/quiz/types"
+	"server/src/internal/feature/quiz/service"
+	"server/src/internal/feature/quiz/types"
 	"github.com/labstack/echo/v4"
 )
 

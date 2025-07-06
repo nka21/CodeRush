@@ -25,3 +25,6 @@ main = "yellow"
 watcher = "cyan"
 build = "green"
 runner = "magenta"
+
+[env]
+ENV = "local"

@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"server/src/internal/quiz/repository"
-	"server/src/internal/quiz/types"
+	"server/src/internal/feature/quiz/repository"
+	"server/src/internal/feature/quiz/types"
 )
 
 // QuizService はクイズ機能のビジネスロジックを担当します。

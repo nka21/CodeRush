@@ -5,7 +5,7 @@ package repository
 import (
 	"errors"
 	"server/src/internal/database"
-	"server/src/internal/quiz/types"
+	"server/src/internal/feature/quiz/types"
 )
 
 // QuizRepository はルームデータへのアクセスを担当します。

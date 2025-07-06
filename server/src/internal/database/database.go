@@ -3,10 +3,13 @@
 package database
 
 import (
+	"server/src/config"
+
+
 	"encoding/json"
 	"os"
 	"sync"
-	"server/src/internal/quiz/types"
+	"server/src/internal/feature/quiz/types"
 )
 
 // DBHandler はJSONファイルへの読み書きを安全に行うためのハンドラです。
@@ -31,6 +34,17 @@ func NewDBHandler(filePath string) (*DBHandler, error) {
 		}
 	}
 	return &DBHandler{filePath: filePath}, nil
+}
+
+func NewDBConnection() (*DBHandler, error) {
+	cfg := config.Load()
+
+	db, err := NewDBHandler(cfg.DBPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 // ReadDB はJSONファイルから全データを読み込みます。
