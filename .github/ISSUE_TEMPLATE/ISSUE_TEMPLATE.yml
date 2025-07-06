@@ -1,39 +1,20 @@
-name: タスク
+name: チケット作成用
 description: 目的と完了条件を記述するテンプレート
-title: "[タスク] "
+title: ""
 labels: []
 body:
-  - type: markdown
+  - type: textarea
+    id: template
     attributes:
+      label: 🎯 目的と完了条件
+      description: このIssueの目的と完了条件を記述してください
       value: |
         ## 🎯 目的
+        （ここに目的を記入）
 
-        このIssueの目的を明確にしてください。
-
-  - type: textarea
-    id: purpose
-    attributes:
-      label: 目的
-      description: このIssueで達成したい目的・背景・Whyなどを書いてください。
-      placeholder: 例）ユーザー登録時のエラー表示を明確にしてUXを向上させたい
-    validations:
-      required: true
-
-  - type: markdown
-    attributes:
-      value: |
         ## ✅ 完了条件
-
-        完了とみなせる具体的な条件をチェックリスト形式で記述してください。
-
-  - type: textarea
-    id: done-criteria
-    attributes:
-      label: 完了条件
-      description: タスクが完了したと判断できる条件をリストアップしてください（チェックボックス形式）。
-      placeholder: |
-        - [ ] APIからのレスポンスにエラーメッセージを含める
-        - [ ] フロントでエラー表示を実装する
-        - [ ] テストで正常系・異常系をカバーする
+        - [ ] （完了条件その1）
+        - [ ] （完了条件その2）
     validations:
       required: true
+
