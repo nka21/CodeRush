@@ -152,7 +152,7 @@ export default function TestPage() {
         {Array.from({ length: totalBars }, (_, i) => {
           const filled = i < filledBars;
           return (
-            <span key={i} className={`flex-1 ${colorClass}`}>
+            <span key={i} className={`flex-1 ${colorClass} text-xs`}>
               {filled ? "▓" : "░"}
             </span>
           );
@@ -258,10 +258,9 @@ export default function TestPage() {
       {/* 進捗とスコア表示 */}
       <div className="my-4">
         {/* スコアとプログレスバー表示 */}
-        <div className="flex items-center justify-between gap-2">
+      <div className="my-4 flex items-center justify-between gap-2">
           {getTerminalProgressBar()}
-          <span className="font-mono text-sm text-white">Score: {score}</span>
-        </div>
+        <span className="font-mono text-xs text-white">Score: {score}</span>
       </div>
 
       {/* コード表示エリア */}
