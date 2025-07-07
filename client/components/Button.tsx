@@ -13,10 +13,17 @@ type Props = {
 export const Button = memo((props: Props) => {
   const { shortcutKey, label, description, onClick, context } = props;
 
+  const baseClasses =
+    "group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg border border-[rgba(0,255,136,0.2)] bg-white/[0.02] p-5 transition-all duration-300 hover:translate-x-[10px] hover:border-[rgba(0,255,136,0.5)] hover:bg-[rgba(0,255,136,0.05)] hover:shadow-[0_0_30px_rgba(0,255,136,0.3),inset_0_0_20px_rgba(0,255,136,0.1)]";
+  const contextClasses =
+    context === "home"
+      ? "menu-item opacity-0"
+      : "animate-in slide-in-from-left-5 duration-500 fill-mode-forwards";
+
   return (
     <button
       type="button"
-      className="menu-item group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg border border-[rgba(0,255,136,0.2)] bg-white/[0.02] p-5 opacity-0 transition-all duration-300 hover:translate-x-[10px] hover:border-[rgba(0,255,136,0.5)] hover:bg-[rgba(0,255,136,0.05)] hover:shadow-[0_0_30px_rgba(0,255,136,0.3),inset_0_0_20px_rgba(0,255,136,0.1)]"
+      className={`${baseClasses} ${contextClasses}`}
       onClick={onClick}
       aria-label={description}
     >
