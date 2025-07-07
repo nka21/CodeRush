@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import mockData from "./_mock/mock.json";
 import type { Question } from "./_types/quiz";
 import React from "react";
+import { TIME_LIMIT } from "./_types/quiz";
 
 export default function TestPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
@@ -13,8 +14,8 @@ export default function TestPage() {
   const [hasAnswered, setHasAnswered] = useState<boolean>(false); // Loading Animetion のため
   const [score, setScore] = useState<number>(0);
 
-  // 制限時間用の状態
-  const [timeRemaining, setTimeRemaining] = useState<number>(30000); // 30秒をミリ秒で管理
+  // プログレスバー用の状態
+  const [timeRemaining, setTimeRemaining] = useState<number>(TIME_LIMIT * 1000); // 30秒をミリ秒で管理
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   const questions: Question[] = mockData.questions as Question[];
@@ -33,7 +34,7 @@ export default function TestPage() {
     setCurrentQuestionIndex((prev) => prev + 1);
     setSelectedAnswer(null);
     setHasAnswered(false);
-    setTimeRemaining(30000); // タイマーをリセット
+    setTimeRemaining(TIME_LIMIT * 1000);
   }, []);
 
   /**
@@ -46,8 +47,8 @@ export default function TestPage() {
     // 2秒後に次の問題へ
     setTimeout(() => {
       moveToNextQuestion();
-    }, 2000);
-  }, [moveToNextQuestion]);
+    }, 1000 * 2);
+  }, []);
 
   /**
    * ボタンがクリックされた時の処理
@@ -71,7 +72,7 @@ export default function TestPage() {
       // 2秒後に次の問題へ進む
       setTimeout(() => {
         moveToNextQuestion();
-      }, 2000);
+      }, 1000 * 2);
     },
     [hasAnswered, questions, currentQuestionIndex, moveToNextQuestion],
   );
@@ -134,15 +135,15 @@ export default function TestPage() {
    * @returns ASCII文字で構成されたプログレスバー文字列
    */
   const getTerminalProgressBar = (): React.ReactNode => {
-    const timeProgress = timeRemaining / 30000; // 0〜1の範囲
-    const totalBars = 30; // プログレスバーの全体長
+    const timeProgress = timeRemaining / (TIME_LIMIT * 1000); // 0〜1の範囲
+    const totalBars = TIME_LIMIT; // プログレスバーの全体長
     const filledBars = Math.floor(timeProgress * totalBars);
 
     // 時間に応じて色を決定
     let colorClass = "text-green-400";
-    if (timeRemaining <= 10000) {
+    if (timeRemaining <= TIME_LIMIT * 1000 * 0.3) {
       colorClass = "text-red-400";
-    } else if (timeRemaining <= 20000) {
+    } else if (timeRemaining <= TIME_LIMIT * 1000 * 0.6) {
       colorClass = "text-yellow-400";
     }
 

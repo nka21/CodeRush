@@ -7,3 +7,5 @@ export type Question = {
   choices: string[];
   correctAnswer: number;
 };
+
+export const TIME_LIMIT = 30;
