@@ -1,0 +1,25 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "difficulty": "easy",
+      "code": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Piscine42\";\n    printf(\"%c\\n\", *(str + 4));\n    return 0;\n}",
+      "choices": ["P", "i", "n", "e"],
+      "correctAnswer": 2
+    },
+    {
+      "id": 2,
+      "difficulty": "medium",
+      "code": "#include <stdio.h>\n\nint main() {\n    char *s = \"hello\";\n    s[0] = 'H';\n    printf(\"%s\\n\", s);\n    return 0;\n}",
+      "choices": ["Hello", "hello", "Segmentation fault", "Compilation error"],
+      "correctAnswer": 2
+    },
+    {
+      "id": 3,
+      "difficulty": "medium",
+      "code": "#include <stdio.h>\n\nvoid f() {\n    static int n = 0;\n    n++;\n    printf(\"%d \", n);\n}\n\nint main() {\n    f(); f(); f();\n    return 0;\n}",
+      "choices": ["1 1 1", "1 2 3", "0 1 2", "3 3 3"],
+      "correctAnswer": 1
+    }
+  ]
+}
