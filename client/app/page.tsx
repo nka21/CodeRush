@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <div className="font-cascadia relative flex min-h-screen items-center justify-center overflow-hidden">
-      <main className="relative z-20 w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_20px_60px_rgba(0,255,65,0.1)]">
+      <main className="relative z-20 w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_0px_42px_rgba(0,255,65,0.1)]">
         <header className="flex items-center gap-2 border-b border-[#333] bg-[#2d2d2d] px-5 py-3">
           <div
             className="h-3 w-3 rounded-full bg-red-500"
