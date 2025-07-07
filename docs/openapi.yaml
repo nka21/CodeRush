@@ -9,13 +9,13 @@ info:
 
 # APIサーバーの情報
 servers:
-  - url: "http://localhost:8080/v1"
+  - url: "http://localhost:8080/api"
     description: "ローカル開発環境"
 
 # APIエンドポイントの定義
 paths:
   # /rooms エンドポイント
-  /rooms:
+  /room:
     post:
       tags:
         - Room
@@ -41,7 +41,7 @@ paths:
           description: "サーバー内部エラー"
 
   # /rooms/{roomId} エンドポイント
-  /rooms/{roomId}:
+  /room/{roomId}:
     get:
       tags:
         - Room
@@ -90,7 +90,7 @@ paths:
           description: "サーバー内部エラー"
 
   # /rooms/{roomId}/join エンドポイント
-  /rooms/{roomId}/join:
+  /room/{roomId}/join:
     post:
       tags:
         - Room
