@@ -74,7 +74,7 @@ export default function TestPage() {
         moveToNextQuestion();
       }, 1000 * 2);
     },
-    [hasAnswered, questions, currentQuestionIndex, moveToNextQuestion],
+    [hasAnswered, questions, currentQuestionIndex],
   );
 
   /**
