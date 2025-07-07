@@ -21,8 +21,6 @@ export default function TestPage() {
   const questions: Question[] = mockData.questions as Question[];
 
   const isQuizComplete = currentQuestionIndex >= questions.length;
-
-  // 現在の問題を安全に取得
   const currentQuestion = isQuizComplete
     ? null
     : questions[currentQuestionIndex];
@@ -111,26 +109,6 @@ export default function TestPage() {
   };
 
   /**
-   * プログレスバーの色を残り問題数に応じて決定する関数
-   * @returns プログレスバーのCSSクラス名
-   */
-  const getProgressBarColor = (): string => {
-    const remainingQuestions = questions.length - currentQuestionIndex;
-    const remainingPercentage = remainingQuestions / questions.length;
-
-    if (remainingPercentage > 2 / 3) {
-      // 残り2/3以上：緑色（安全）
-      return "bg-gradient-to-r from-green-500 to-green-400";
-    } else if (remainingPercentage > 1 / 3) {
-      // 残り1/3〜2/3：黄色（注意）
-      return "bg-gradient-to-r from-yellow-500 to-yellow-400";
-    } else {
-      // 残り1/3以下：赤色（危険）
-      return "bg-gradient-to-r from-red-500 to-red-400";
-    }
-  };
-
-  /**
    * ターミナル風ASCIIプログレスバーを生成
    * @returns ASCII文字で構成されたプログレスバー文字列
    */
@@ -159,19 +137,6 @@ export default function TestPage() {
         })}
       </div>
     );
-  };
-
-  /**
-   * 滑らかなプログレスバーの色を決定
-   * @returns CSSクラス名
-   */
-  const getSmoothProgressColor = (): string => {
-    if (timeRemaining <= 10000) {
-      return "bg-gradient-to-r from-red-500 to-red-400"; // 残り10秒以下：赤色
-    } else if (timeRemaining <= 20000) {
-      return "bg-gradient-to-r from-yellow-500 to-yellow-400"; // 残り20秒以下：黄色
-    }
-    return "bg-gradient-to-r from-green-500 to-green-400"; // デフォルト：緑色
   };
 
   // === キーボードショートカットの実装 ===
@@ -256,10 +221,9 @@ export default function TestPage() {
   return (
     <TerminalLayout cli={`--question ${currentQuestionIndex + 1}`}>
       {/* 進捗とスコア表示 */}
-      <div className="my-4">
-        {/* スコアとプログレスバー表示 */}
+      {/* スコアとプログレスバー表示 */}
       <div className="my-4 flex items-center justify-between gap-2">
-          {getTerminalProgressBar()}
+        {getTerminalProgressBar()}
         <span className="font-mono text-xs text-white">Score: {score}</span>
       </div>
 
