@@ -1,107 +1,172 @@
 "use client";
-import { useState } from "react";
-import { RoomButton } from "./_components/RoomButton";
-import { Modal } from "./_components/Modal";
 
-const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"] as const;
-type Difficulty = (typeof DIFFICULTY_LEVELS)[number];
-
-const QUIZ_LANGUAGES = [
-  "C",
-  "Python",
-  "Java",
-  "Go",
-  "JavaScript",
-  "C++",
-  "C#",
-] as const;
-type QuizLanguage = (typeof QUIZ_LANGUAGES)[number];
+import { useCallback, useEffect, useState } from "react";
 
 export default function Home() {
-  const [modal, setModal] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>("");
 
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState<Difficulty>("Normal");
-  const [selectedGenre, setSelectedGenre] = useState<QuizLanguage>("C");
+  /**
+   * 部屋作成モーダルを表示
+   */
+  const handleMakeRoom = useCallback(() => {
+    console.log("> Making new room...");
+    // TODO: 部屋作成モーダルを表示
+  }, []);
+
+  /**
+   * 部屋参加モーダルを表示
+   */
+  const handleJoinRoom = useCallback(() => {
+    console.log("> Joining existing room...");
+    // TODO: 部屋参加モーダルを表示
+  }, []);
+
+  /**
+   * キーボードショートカット（1キー：部屋作成、2キー：部屋参加）
+   */
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "1") handleMakeRoom();
+      if (event.key === "2") handleJoinRoom();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleMakeRoom, handleJoinRoom]);
+
+  /**
+   * 現在時刻を更新
+   */
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString());
+    };
+
+    updateTime(); // 初回実行
+    const interval = setInterval(updateTime, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="text-center">
-      <h1 className="mb-8 py-25 text-7xl font-bold">Code Rush!</h1>
-      <div className="flex items-center justify-center gap-20">
-        <RoomButton onClick={() => setModal("make")} variant="作成" />
-        <RoomButton onClick={() => setModal("join")} variant="参加" />
-      </div>
+    <div className="font-cascadia relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
+      <main className="relative z-20 w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_20px_60px_rgba(0,255,65,0.1)]">
+        <header className="flex items-center gap-2 border-b border-[#333] bg-[#2d2d2d] px-5 py-3">
+          <div
+            className="h-3 w-3 rounded-full bg-red-500"
+            aria-label="Close"
+          ></div>
+          <div
+            className="h-3 w-3 rounded-full bg-yellow-500"
+            aria-label="Minimize"
+          ></div>
+          <div
+            className="h-3 w-3 rounded-full bg-green-500"
+            aria-label="Maximize"
+          ></div>
+          <div className="ml-2 text-sm text-white opacity-80">
+            code-rush@progate
+          </div>
+        </header>
 
-      <Modal isOpen={modal === "make"} onClose={() => setModal(null)}>
-        <h2 className="mb-4 text-2xl font-bold">部屋を作成します</h2>
-        <p className="mb-2">
-          新しい対戦部屋を作成します。難易度とジャンルを選んでください。
-        </p>
+        <section className="relative min-h-96 bg-black p-8 text-green-400">
+          {/* コマンドライン */}
+          <div className="mb-2 flex items-center">
+            <span className="mr-2 text-green-400" aria-label="プロンプト">
+              aws@progate:~$
+            </span>
+            <span className="text-white">./code-rush --init</span>
+          </div>
 
-        {/* 難易度選択 */}
-        <p className="mt-4 mb-2">難易度を選択：</p>
-        <div className="mb-6 flex justify-center gap-4">
-          {DIFFICULTY_LEVELS.map((level) => (
+          {/* ステータス */}
+          <div className="mb-2 flex items-center">
+            <span className="mr-2 text-green-400" aria-label="出力">
+              &gt;
+            </span>
+            <span className="text-white">Initializing Code Rush...</span>
+          </div>
+
+          {/* メインタイトル */}
+          <div className="glitch my-4">
+            <h1 className="font-sixtyfour typing-text text-4xl font-bold text-green-400 md:text-5xl">
+              CODE RUSH
+            </h1>
+          </div>
+
+          <div className="mb-2 flex items-center">
+            <span className="mr-2 text-green-400" aria-label="出力">
+              &gt;
+            </span>
+            <span className="text-white">
+              Real-time collaborative coding platform ready.
+            </span>
+          </div>
+
+          {/* メニュー */}
+          <nav className="mt-8 flex flex-col" role="menu">
             <button
-              key={level}
-              onClick={() => setSelectedDifficulty(level as Difficulty)}
-              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                selectedDifficulty === level
-                  ? "bg-blue-600 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-              }`}
+              className="menu-item group relative my-2 flex cursor-pointer items-center overflow-hidden rounded-lg border border-[rgba(0,255,136,0.2)] bg-white/[0.02] p-5 opacity-0 transition-all duration-300 hover:translate-x-[10px] hover:border-[rgba(0,255,136,0.5)] hover:bg-[rgba(0,255,136,0.05)] hover:shadow-[0_0_30px_rgba(0,255,136,0.3),inset_0_0_20px_rgba(0,255,136,0.1)]"
+              onClick={handleMakeRoom}
+              role="menuitem"
+              aria-label="新しい部屋を作成する"
             >
-              {level}
+              <kbd className="mr-4 font-bold text-[#ff00ff] [text-shadow:0_0_10px_rgba(255,0,255,0.5)]">
+                [1]
+              </kbd>
+              <div className="flex flex-col items-start">
+                <span className="text-lg text-white">MAKE_ROOM</span>
+                <p className="mt-1 text-sm text-gray-400">
+                  新しいコーディングセッションを開始
+                </p>
+              </div>
+              <span
+                className="menu-arrow ml-auto transition-all duration-300 group-hover:translate-x-[5px] group-hover:text-[#00ff88]"
+                aria-hidden="true"
+              >
+                →
+              </span>
             </button>
-          ))}
-        </div>
 
-        {/* ジャンル選択 */}
-        <p className="mb-2">ジャンルを選択：</p>
-        <div className="mb-6 flex flex-wrap justify-center gap-3">
-          {QUIZ_LANGUAGES.map((language) => (
             <button
-              key={language}
-              onClick={() => setSelectedGenre(language)}
-              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                selectedGenre === language
-                  ? "bg-green-600 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-              }`}
+              className="menu-item group relative my-2 flex cursor-pointer items-center overflow-hidden rounded-lg border border-[rgba(0,255,136,0.2)] bg-white/[0.02] p-5 opacity-0 transition-all duration-300 hover:translate-x-[10px] hover:border-[rgba(0,255,136,0.5)] hover:bg-[rgba(0,255,136,0.05)] hover:shadow-[0_0_30px_rgba(0,255,136,0.3),inset_0_0_20px_rgba(0,255,136,0.1)]"
+              onClick={handleJoinRoom}
+              role="menuitem"
+              aria-label="既存の部屋に参加する"
             >
-              {language}
+              <kbd className="mr-4 font-bold text-[#ff00ff] [text-shadow:0_0_10px_rgba(255,0,255,0.5)]">
+                [2]
+              </kbd>
+              <div className="flex flex-col items-start">
+                <span className="text-lg text-white">JOIN_ROOM</span>
+                <p className="mt-1 text-sm text-gray-400">
+                  既存のセッションに参加
+                </p>
+              </div>
+              <span
+                className="menu-arrow ml-auto transition-all duration-300 group-hover:translate-x-[5px] group-hover:text-[#00ff88]"
+                aria-hidden="true"
+              >
+                →
+              </span>
             </button>
-          ))}
-        </div>
+          </nav>
 
-        {/* 決定ボタン */}
-        <button
-          onClick={() => {
-            console.log("部屋作成: 難易度 =", selectedDifficulty);
-            console.log("ジャンル =", selectedGenre);
-            setModal(null);
-          }}
-          className="mt-6 rounded-md bg-blue-500 px-4 py-2 text-white"
-        >
-          決定
-        </button>
-      </Modal>
+          {/* カーソル */}
+          <div className="mt-8 flex items-center">
+            <span className="mr-2 text-green-400" aria-label="プロンプト">
+              aws@progate:~$
+            </span>
+            <span className="cursor" aria-hidden="true"></span>
+          </div>
+        </section>
 
-      <Modal isOpen={modal === "join"} onClose={() => setModal(null)}>
-        <h2 className="mb-4 text-2xl font-bold">部屋に参加します</h2>
-        <p>参加コードを入力してください。</p>
-        <input
-          type="text"
-          className="mt-2 w-full rounded-md border-2 border-gray-300 p-2"
-          placeholder="例: ABCD"
-        />
-        <button
-          onClick={() => setModal(null)}
-          className="mt-6 rounded-md bg-green-500 px-4 py-2 text-white"
-        >
-          参加
-        </button>
-      </Modal>
+        <footer className="flex justify-between border-t border-[#333] bg-[#2d2d2d] px-5 py-2 text-xs text-gray-400">
+          <span>Ready</span>
+          <span>Connected to server</span>
+          <time>{currentTime}</time>
+        </footer>
+      </main>
     </div>
   );
 }
