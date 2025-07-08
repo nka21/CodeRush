@@ -1,5 +1,6 @@
 "use client";
 
+import { useTypingAnimation } from "@/hooks/useTypingAnimation";
 import React, { memo, useEffect, useState } from "react";
 
 type TerminalHeaderProps = {
@@ -60,6 +61,13 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
 
   const [currentLocalTime, setCurrentLocalTime] = useState<string>("");
 
+  // タイピングアニメーション用
+  const commandText = `./code-rush ${cli || ""}`;
+  const { displayedText, isComplete } = useTypingAnimation({
+    text: commandText,
+    baseSpeed: 80,
+  });
+
   /**
    * ローカル時刻を1秒ごとに更新する
    */
@@ -85,10 +93,13 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
             <span className="mr-2 text-green-400" aria-label="プロンプト">
               {currentPath}:~$
             </span>
-            <span className="text-white">./code-rush {cli}</span>
+            <span className="text-white">
+              {displayedText}
+              {!isComplete && <span className="animate-pulse">|</span>}
+            </span>
           </div>
 
-          <div className="flex flex-1 flex-col">{children}</div>
+          {isComplete && <div className="flex flex-1 flex-col">{children}</div>}
 
           <div className="mt-8 flex items-center">
             <span className="mr-2 text-green-400" aria-label="プロンプト">
