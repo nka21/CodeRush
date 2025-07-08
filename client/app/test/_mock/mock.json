@@ -5,7 +5,7 @@
       "difficulty": "easy",
       "code": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Piscine42\";\n    printf(\"%c\\n\", *(str + 4));\n    return 0;\n}",
       "choices": ["P", "i", "n", "e"],
-      "correctAnswer": 2
+      "correctAnswer": 1
     },
     {
       "id": 2,
