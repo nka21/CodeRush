@@ -141,12 +141,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     return (
       <TerminalLayout cli="--complete" onTypingComplete={() => {}}>
         <QuizResultScreen result={quizResult} />
-        <button
-          onClick={() => router.push("/")}
-          className="mt-6 rounded-lg bg-green-500 px-6 py-3 text-white hover:bg-green-600"
-        >
-          ホームに戻る
-        </button>
       </TerminalLayout>
     );
   }
@@ -174,7 +168,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
                 ? answerState.type === "time_expired"
                   ? "Time up! Processing..."
                   : "Processing..."
-                : "Select your answer:"}
+                : "Choose correct output:"}
             </span>
           </div>
 
