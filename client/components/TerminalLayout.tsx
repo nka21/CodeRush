@@ -1,5 +1,6 @@
 "use client";
 
+import { useTypingAnimation } from "@/hooks/useTypingAnimation";
 import React, { memo, useEffect, useState } from "react";
 
 type TerminalHeaderProps = {
@@ -30,7 +31,7 @@ type TerminalFooterProps = {
 };
 
 // フッターは時刻が変わる影響で、頻繁に再レンダリングされるため、memo化しない
-const TerminalFooter = (props: TerminalFooterProps) => {
+const TerminalFooter = memo((props: TerminalFooterProps) => {
   const { currentTime } = props;
 
   return (
@@ -40,7 +41,7 @@ const TerminalFooter = (props: TerminalFooterProps) => {
       <time>{currentTime}</time>
     </footer>
   );
-};
+});
 
 // === TerminalLayout ===
 type TerminalLayoutProps = {
@@ -48,17 +49,33 @@ type TerminalLayoutProps = {
   title?: string;
   currentPath?: string;
   cli?: string;
+  onTypingComplete?: () => void;
 };
 
-export const TerminalLayout = (props: TerminalLayoutProps) => {
+export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   const {
     children,
     title = "code-rush@progate",
     currentPath = "aws@progate",
     cli,
+    onTypingComplete,
   } = props;
 
   const [currentLocalTime, setCurrentLocalTime] = useState<string>("");
+
+  // タイピングアニメーション用
+  const commandText = `./code-rush ${cli || ""}`;
+  const { displayedText, isComplete } = useTypingAnimation({
+    text: commandText,
+    baseSpeed: 80,
+  });
+
+  // タイピング完了を通知
+  useEffect(() => {
+    if (isComplete && onTypingComplete) {
+      onTypingComplete();
+    }
+  }, [isComplete, onTypingComplete]);
 
   /**
    * ローカル時刻を1秒ごとに更新する
@@ -85,10 +102,13 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
             <span className="mr-2 text-green-400" aria-label="プロンプト">
               {currentPath}:~$
             </span>
-            <span className="text-white">./code-rush {cli}</span>
+            <span className="text-white">
+              {displayedText}
+              {!isComplete && <span className="animate-pulse">|</span>}
+            </span>
           </div>
 
-          <div className="flex flex-1 flex-col">{children}</div>
+          {isComplete && <div className="flex flex-1 flex-col">{children}</div>}
 
           <div className="mt-8 flex items-center">
             <span className="mr-2 text-green-400" aria-label="プロンプト">
@@ -102,4 +122,4 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
       </main>
     </div>
   );
-};
+});
