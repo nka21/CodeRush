@@ -8,34 +8,32 @@ import { Button } from "@/components/Button";
 export default function Home() {
   const router = useRouter();
 
-  /**
-   * 部屋作成モーダルを表示
-   */
-  const handleMakeRoom = useCallback(() => {
-    console.log("> Making new room...");
-    // TODO: 部屋作成モーダルを表示
+  const handleDisplayMakeModal = useCallback(() => {
+    console.log("> Starting test mode...");
+    router.push("/test");
   }, []);
 
   /**
-   * 部屋参加モーダルを表示
+   * 対戦モードへ遷移（未実装）
    */
-  const handleJoinRoom = useCallback(() => {
-    console.log("> Joining existing room...");
-    // TODO: 部屋参加モーダルを表示
+  const handleDisplayJoinModal = useCallback(() => {
+    console.log("> Starting battle mode...");
+    // TODO: 対戦モード実装時に適切なルートへ遷移
+    alert("対戦モードは準備中です");
   }, []);
 
   /**
-   * キーボードショートカット（1キー：部屋作成、2キー：部屋参加）
+   * キーボードショートカット（1キー：テストモード、2キー：対戦モード）
    */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "1") handleMakeRoom();
-      if (event.key === "2") handleJoinRoom();
+      if (event.key === "1") handleDisplayMakeModal();
+      if (event.key === "2") handleDisplayJoinModal();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleMakeRoom, handleJoinRoom]);
+  }, []);
 
   return (
     <TerminalLayout cli="--init">
@@ -57,14 +55,14 @@ export default function Home() {
       <nav className="mt-8 flex flex-col gap-4" role="menu">
         <Button
           context="home"
-          onClick={() => router.push("/test")}
+          onClick={handleDisplayMakeModal}
           label="MAKE_ROOM"
           description="ゲームルームを作成する"
           shortcutKey={1}
         />
         <Button
           context="home"
-          onClick={handleJoinRoom}
+          onClick={handleDisplayJoinModal}
           label="JOIN_ROOM"
           description="既存の部屋に参加する"
           shortcutKey={2}
