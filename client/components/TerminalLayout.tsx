@@ -108,7 +108,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
             </span>
           </div>
 
-          {isComplete && <div className="flex flex-1 flex-col">{children}</div>}
+          <div className="flex flex-1 flex-col">{isComplete && children}</div>
 
           <div className="mt-8 flex items-center">
             <span className="mr-2 text-green-400" aria-label="プロンプト">
