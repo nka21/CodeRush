@@ -67,7 +67,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   const commandText = `./code-rush ${cli || ""}`;
   const { displayedText, isComplete } = useTypingAnimation({
     text: commandText,
-    baseSpeed: 80,
+    baseSpeed: 10,
   });
 
   // タイピング完了を通知
