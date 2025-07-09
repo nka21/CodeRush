@@ -45,3 +45,5 @@ export const Button = memo((props: Props) => {
     </button>
   );
 });
+
+Button.displayName = "Button";
