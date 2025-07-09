@@ -31,7 +31,7 @@ type TerminalFooterProps = {
 };
 
 // フッターは時刻が変わる影響で、頻繁に再レンダリングされるため、memo化しない
-const TerminalFooter = (props: TerminalFooterProps) => {
+const TerminalFooter = memo((props: TerminalFooterProps) => {
   const { currentTime } = props;
 
   return (
@@ -41,7 +41,7 @@ const TerminalFooter = (props: TerminalFooterProps) => {
       <time>{currentTime}</time>
     </footer>
   );
-};
+});
 
 // === TerminalLayout ===
 type TerminalLayoutProps = {
@@ -49,14 +49,16 @@ type TerminalLayoutProps = {
   title?: string;
   currentPath?: string;
   cli?: string;
+  onTypingComplete?: () => void;
 };
 
-export const TerminalLayout = (props: TerminalLayoutProps) => {
+export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   const {
     children,
     title = "code-rush@progate",
     currentPath = "aws@progate",
     cli,
+    onTypingComplete,
   } = props;
 
   const [currentLocalTime, setCurrentLocalTime] = useState<string>("");
@@ -67,6 +69,13 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
     text: commandText,
     baseSpeed: 80,
   });
+
+  // タイピング完了を通知
+  useEffect(() => {
+    if (isComplete && onTypingComplete) {
+      onTypingComplete();
+    }
+  }, [isComplete, onTypingComplete]);
 
   /**
    * ローカル時刻を1秒ごとに更新する
@@ -113,4 +122,4 @@ export const TerminalLayout = (props: TerminalLayoutProps) => {
       </main>
     </div>
   );
-};
+});
