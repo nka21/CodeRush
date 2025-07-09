@@ -7,7 +7,7 @@ type Props = {
   onClick: () => void;
   label: string;
   description?: string;
-  shortcutKey: number;
+  shortcutKey?: number;
 };
 
 export const Button = memo((props: Props) => {
@@ -27,9 +27,11 @@ export const Button = memo((props: Props) => {
       onClick={onClick}
       aria-label={description}
     >
-      <kbd className="mr-4 font-bold text-[#ff00ff] [text-shadow:0_0_10px_rgba(255,0,255,0.5)]">
-        [{shortcutKey}]
-      </kbd>
+      {shortcutKey && (
+        <kbd className="mr-4 font-bold text-[#ff00ff] [text-shadow:0_0_10px_rgba(255,0,255,0.5)]">
+          [{shortcutKey}]
+        </kbd>
+      )}
       <div className="flex flex-col items-start">
         <span className="text-lg text-white">{label}</span>
         <p className="mt-1 text-sm text-gray-400">{description}</p>
