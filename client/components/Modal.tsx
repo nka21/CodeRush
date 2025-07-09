@@ -1,6 +1,5 @@
 // Modal.tsx
-'use client';
-
+"use client";
 
 // Propsの型を定義
 type ModalProps = {
@@ -10,7 +9,6 @@ type ModalProps = {
 };
 
 export const Modal = (props: ModalProps) => {
-
   const { isOpen, onClose, children } = props;
 
   // isOpenがfalseの場合は何もレンダリングしない
@@ -21,19 +19,19 @@ export const Modal = (props: ModalProps) => {
   return (
     // オーバーレイ（背景部分）
     <div
-      className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50"
+      className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center"
       onClick={onClose} // 背景クリックで閉じる
     >
       {/* モーダル本体 */}
       <div
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md relative border border-black-500"
+        className="border-black-500 relative w-full max-w-md rounded-lg border bg-white p-8 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         aria-label="部屋作成モーダル" // モーダル内のクリックが背景に伝播しないようにする
       >
         {/* 閉じるボタン */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
+          className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-800"
         >
           &times;
         </button>
@@ -42,4 +40,4 @@ export const Modal = (props: ModalProps) => {
       </div>
     </div>
   );
-}
+};
