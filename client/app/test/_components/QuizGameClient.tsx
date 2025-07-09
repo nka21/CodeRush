@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TerminalLayout } from "@/components/TerminalLayout";
-import { useQuizGame } from "@/hooks/useQuizGame";
 import { QuizTimerSection } from "./QuizTimerSection";
 import { CodeDisplay } from "./CodeDisplay";
 import { AnswerChoice } from "./AnswerChoice";
 import { QuizResultScreen } from "./QuizResult";
-import type { Question, QuizResult } from "../_types/quiz";
+import type { Question, QuizResult, AnswerState } from "../_types/quiz";
+import { ANIMATION } from "../_constants/quiz";
 
 type QuizGameClientProps = {
   questions: Question[];
@@ -21,6 +21,17 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
 
+  // Quiz game state (previously in useQuizGame)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [answerState, setAnswerState] = useState<AnswerState>({
+    type: "unanswered",
+  });
+
+  const currentQuestion = questions[currentQuestionIndex] ?? null;
+  const isComplete = currentQuestionIndex >= questions.length;
+  const hasAnswered = answerState.type !== "unanswered";
+
   const handleQuizComplete = useCallback((result: QuizResult) => {
     setQuizResult(result);
   }, []);
@@ -29,17 +40,79 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     setIsTypingComplete(true);
   }, []);
 
-  const {
-    currentQuestion,
-    currentQuestionIndex,
-    score,
-    isComplete,
-    hasAnswered,
-    answerState,
-    submitAnswer,
-    handleTimeExpired,
-    getAnswerChoiceStatus,
-  } = useQuizGame({ questions, onComplete: handleQuizComplete });
+  const checkAnswer = useCallback(
+    (selectedIndex: number): boolean => {
+      if (!currentQuestion) return false;
+      return selectedIndex === currentQuestion.correctAnswer;
+    },
+    [currentQuestion],
+  );
+
+  const moveToNextQuestion = useCallback(() => {
+    const nextIndex = currentQuestionIndex + 1;
+
+    if (nextIndex >= questions.length) {
+      // クイズ完了
+      const result: QuizResult = {
+        score,
+        totalQuestions: questions.length,
+        accuracyPercentage: Math.round((score / questions.length) * 100),
+      };
+      handleQuizComplete(result);
+    } else {
+      setCurrentQuestionIndex(nextIndex);
+      setAnswerState({ type: "unanswered" });
+    }
+  }, [currentQuestionIndex, questions.length, score, handleQuizComplete]);
+
+  const submitAnswer = useCallback(
+    (selectedIndex: number) => {
+      if (hasAnswered || !currentQuestion) return;
+
+      setAnswerState({ type: "answered", selectedIndex });
+
+      if (checkAnswer(selectedIndex)) {
+        setScore((prev) => prev + 1);
+      }
+
+      // 次の問題へ自動遷移
+      setTimeout(() => {
+        moveToNextQuestion();
+      }, ANIMATION.ANSWER_REVEAL_DELAY_MS);
+    },
+    [hasAnswered, currentQuestion, checkAnswer, moveToNextQuestion],
+  );
+
+  const handleTimeExpired = useCallback(() => {
+    if (hasAnswered) return;
+
+    setAnswerState({ type: "time_expired" });
+
+    setTimeout(() => {
+      moveToNextQuestion();
+    }, ANIMATION.ANSWER_REVEAL_DELAY_MS);
+  }, [hasAnswered, moveToNextQuestion]);
+
+  const getAnswerChoiceStatus = useCallback(
+    (choiceIndex: number) => {
+      if (!hasAnswered || !currentQuestion) return "default";
+
+      const isCorrect = choiceIndex === currentQuestion.correctAnswer;
+
+      if (answerState.type === "time_expired") {
+        return isCorrect ? "correct" : "disabled";
+      }
+
+      if (answerState.type === "answered") {
+        if (isCorrect) return "correct";
+        if (choiceIndex === answerState.selectedIndex) return "incorrect";
+        return "disabled";
+      }
+
+      return "default";
+    },
+    [answerState, currentQuestion, hasAnswered],
+  );
 
   // 問題が変わったらタイピング状態をリセット
   useEffect(() => {
