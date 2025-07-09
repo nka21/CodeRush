@@ -37,9 +37,7 @@ export const HomeClient = () => {
         <span className="mr-2 text-green-400" aria-label="出力">
           &gt;
         </span>
-        <span className="text-white">
-          Real-time collaborative coding platform ready.
-        </span>
+        <span className="text-white">早押しコードリーディング対決</span>
       </div>
 
       <nav className="mt-8 flex flex-col gap-4" role="menu">
@@ -54,7 +52,7 @@ export const HomeClient = () => {
           context="home"
           onClick={handleDisplayJoinModal}
           label="JOIN_ROOM"
-          description="既存の部屋に参加する"
+          description="ゲームルームに参加する"
           shortcutKey={2}
         />
       </nav>
