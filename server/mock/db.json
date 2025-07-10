@@ -1,49 +1,5 @@
 {
   "rooms": {
-    "42": {
-      "roomId": "42",
-      "hostId": "user_59799649e3cc30d9",
-      "settings": {
-        "difficulty": "Normal",
-        "language": "Python"
-      },
-      "players": {
-        "user_438e985574fe71ed": {
-          "name": "Challenger",
-          "score": 0,
-          "isReady": false
-        },
-        "user_59799649e3cc30d9": {
-          "name": "Host",
-          "score": 0,
-          "isReady": true
-        },
-        "user_77a798f634b29faa": {
-          "name": "Challenger",
-          "score": 0,
-          "isReady": false
-        }
-      },
-      "gameState": "waiting",
-      "createdAt": "2025-07-06T03:59:54.876077792Z"
-    },
-    "42tokyo": {
-      "roomId": "42tokyo",
-      "hostId": "user_825db69f979eadf9",
-      "settings": {
-        "difficulty": "Normal",
-        "language": "Python"
-      },
-      "players": {
-        "user_825db69f979eadf9": {
-          "name": "Host",
-          "score": 0,
-          "isReady": true
-        }
-      },
-      "gameState": "waiting",
-      "createdAt": "2025-07-06T04:00:50.75321808Z"
-    },
     "AWS": {
       "roomId": "AWS",
       "hostId": "user_8178db337ea2a3d1",
@@ -77,6 +33,23 @@
       },
       "gameState": "waiting",
       "createdAt": "2025-07-06T08:05:51.418401853Z"
+    },
+    "wstest": {
+      "roomId": "wstest",
+      "hostId": "user_ed1dff1babc4d9e9",
+      "settings": {
+        "difficulty": "Normal",
+        "language": "Python"
+      },
+      "players": {
+        "user_ed1dff1babc4d9e9": {
+          "name": "Host",
+          "score": 0,
+          "isReady": true
+        }
+      },
+      "gameState": "waiting",
+      "createdAt": "2025-07-09T07:21:15.227661181Z"
     }
   }
 }
