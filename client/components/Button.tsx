@@ -25,7 +25,7 @@ export const Button = memo((props: Props) => {
       type="button"
       className={`${baseClasses} ${contextClasses}`}
       onClick={onClick}
-      aria-label={description}
+      aria-label={description || label}
     >
       {shortcutKey && (
         <kbd className="mr-4 font-bold text-[#ff00ff] [text-shadow:0_0_10px_rgba(255,0,255,0.5)]">
