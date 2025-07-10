@@ -30,7 +30,6 @@ type TerminalFooterProps = {
   currentTime: string;
 };
 
-// フッターは時刻が変わる影響で、頻繁に再レンダリングされるため、memo化しない
 const TerminalFooter = memo((props: TerminalFooterProps) => {
   const { currentTime } = props;
 
