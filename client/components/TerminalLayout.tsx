@@ -94,7 +94,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
 
   return (
     <div className="font-cascadia relative flex min-h-screen items-center justify-center overflow-hidden">
-      <main className="relative z-20 w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_0px_42px_rgba(0,255,65,0.1)]">
+      <main className="relative z-20 max-h-[90vh] w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_0px_42px_rgba(0,255,65,0.1)]">
         <TerminalHeader title={title} />
 
         <section className="relative flex min-h-96 flex-1 flex-col bg-black p-8 text-green-400">
