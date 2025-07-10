@@ -24,7 +24,7 @@ export const Modal = (props: ModalProps) => {
     >
       {/* モーダル本体 */}
       <div
-        className="border-black-500 relative w-full max-w-md rounded-lg border bg-white p-8 shadow-xl"
+        className="relative w-full max-w-md rounded-lg border border-gray-500 bg-white p-8 shadow-xl"
         onClick={(e) => e.stopPropagation()}
         aria-label="部屋作成モーダル" // モーダル内のクリックが背景に伝播しないようにする
       >
