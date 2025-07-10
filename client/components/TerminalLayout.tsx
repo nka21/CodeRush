@@ -98,7 +98,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
         <TerminalHeader title={title} />
 
         <section className="relative flex min-h-96 flex-1 flex-col bg-black p-8 text-green-400">
-          <div className="mb-2 flex items-center">
+          <div className="mb-2 flex flex-col items-start sm:flex-row sm:items-center">
             <span className="mr-2 text-green-400" aria-label="プロンプト">
               {currentPath}:~$
             </span>
