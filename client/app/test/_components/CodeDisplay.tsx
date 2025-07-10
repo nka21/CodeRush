@@ -1,4 +1,7 @@
 import { memo, useRef, useState, useEffect } from "react";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 
 type CodeDisplayProps = {
   code: string;
@@ -42,7 +45,9 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
         className="scrollbar-thin scrollbar-thumb-gray-500/50 scrollbar-track-transparent hover:scrollbar-thumb-gray-400/70 max-h-[calc(90vh-510px)] overflow-y-auto rounded-lg border border-[#333] bg-gray-900 p-4"
       >
         <pre className="overflow-x-auto text-sm text-gray-300">
-          <code>{code}</code>
+          <SyntaxHighlighter language="c" style={vscDarkPlus}>
+		  {code}
+		</SyntaxHighlighter>
         </pre>
       </div>
 
