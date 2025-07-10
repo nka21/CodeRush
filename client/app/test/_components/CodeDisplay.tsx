@@ -1,7 +1,6 @@
 import { memo, useRef, useState, useEffect } from "react";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type CodeDisplayProps = {
   code: string;
@@ -42,13 +41,15 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
     <div className="relative mb-8">
       <div
         ref={scrollRef}
-        className="scrollbar-thin scrollbar-thumb-gray-500/50 scrollbar-track-transparent hover:scrollbar-thumb-gray-400/70 max-h-[calc(90vh-510px)] overflow-y-auto rounded-lg border border-[#333] bg-[#1E1E1E] p-4"
+        className="scrollbar-thin scrollbar-thumb-gray-500/50 scrollbar-track-transparent hover:scrollbar-thumb-gray-400/70 max-h-[calc(90vh-510px)] overflow-y-auto rounded-lg border border-[#333] bg-[#1E1E1E]"
       >
-        <pre className="overflow-x-auto text-sm text-gray-300">
-          <SyntaxHighlighter language="c" style={vscDarkPlus}>
-		  {code}
-		</SyntaxHighlighter>
-        </pre>
+        <SyntaxHighlighter
+          language="c"
+          style={vscDarkPlus}
+          className="overflow-x-auto"
+        >
+          {code}
+        </SyntaxHighlighter>
       </div>
 
       {/* 下部のシャドー：スクロール可能な場合のみ表示 */}
