@@ -12,6 +12,23 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
       <pre className="overflow-x-auto text-sm text-gray-300">
         <code>{code}</code>
       </pre>
+      <style jsx>
+        {`
+          div::-webkit-scrollbar {
+            width: 8px;
+          }
+          div::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          div::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 4px;
+          }
+          div::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5);
+          }
+        `}
+      </style>
     </div>
   );
 });
