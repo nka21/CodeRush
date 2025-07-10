@@ -1,27 +1,13 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-sixtyfour: var(--font-sixtyfour);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: #171717;
   color: var(--foreground);
   font-family: "Cascadia Mono", monospace, Arial, Helvetica, sans-serif;
 }
@@ -137,12 +123,12 @@ body {
 
 /* 1番目のメニュー: 0.9秒後に表示開始 */
 .menu-item:nth-child(1) {
-  animation-delay: 0.9s;
+  animation-delay: 3s;
 }
 
 /* 2番目のメニュー: 1.1秒後に表示開始 */
 .menu-item:nth-child(2) {
-  animation-delay: 1.1s;
+  animation-delay: 3.2s;
 }
 
 /* メニューホバー時の光沢効果: 左から右へ光が流れる */
@@ -165,4 +151,31 @@ body {
 /* ホバー時: 光沢が左から右へ移動 */
 .menu-item:hover::before {
   left: 100%;
+}
+
+/* ===== クイズ用アニメーション ===== */
+
+/* 不正解時の振動アニメーション */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
 }
