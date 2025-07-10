@@ -67,6 +67,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   const { displayedText, isComplete } = useTypingAnimation({
     text: commandText,
     baseSpeed: 10,
+    delayAfterCompletion: 1000,
   });
 
   // タイピング完了を通知

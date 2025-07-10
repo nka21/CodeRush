@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 type UseTypingAnimationProps = {
   text: string;
   baseSpeed: number;
+  delayAfterCompletion: number;
 };
 
 export const useTypingAnimation = (props: UseTypingAnimationProps) => {
-  const { text, baseSpeed } = props;
+  const { text, baseSpeed, delayAfterCompletion } = props;
 
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -20,6 +21,7 @@ export const useTypingAnimation = (props: UseTypingAnimationProps) => {
 
     let index = 0;
     let timeoutId: NodeJS.Timeout;
+    let completionTimeoutId: NodeJS.Timeout;
     setDisplayedText("");
     setIsComplete(false);
 
@@ -32,7 +34,14 @@ export const useTypingAnimation = (props: UseTypingAnimationProps) => {
         const randomDelay = baseSpeed + Math.random() * 100;
         timeoutId = setTimeout(typeNextChar, randomDelay);
       } else {
-        setIsComplete(true);
+        // タイピング完了後に遅延
+        if (delayAfterCompletion > 0) {
+          completionTimeoutId = setTimeout(() => {
+            setIsComplete(true);
+          }, delayAfterCompletion);
+        } else {
+          setIsComplete(true);
+        }
       }
     };
 
@@ -41,6 +50,9 @@ export const useTypingAnimation = (props: UseTypingAnimationProps) => {
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
+      }
+      if (completionTimeoutId) {
+        clearTimeout(completionTimeoutId);
       }
     };
   }, [text]);
