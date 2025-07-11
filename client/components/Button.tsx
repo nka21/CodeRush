@@ -3,7 +3,7 @@ import { memo } from "react";
 type ButtonContext = "home" | "game";
 
 type Props = {
-  context: ButtonContext;
+  context?: ButtonContext;
   onClick: () => void;
   label: string;
   description?: string;
@@ -36,7 +36,7 @@ export const Button = memo((props: Props) => {
         <span className="text-lg text-white">{label}</span>
         <p className="mt-1 text-sm text-gray-400">{description}</p>
       </div>
-      {context === "home" && (
+      {context !== "game" && (
         <span
           className="menu-arrow ml-auto transition-all duration-300 group-hover:translate-x-[5px] group-hover:text-[#00ff88]"
           aria-hidden="true"

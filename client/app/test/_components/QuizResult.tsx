@@ -21,25 +21,25 @@ const players = [
   {name: 'Kazuya', score: 120 },
   {name: 'Soma', score: 95 },
   {name: 'Yuki', score: 110 },
+  {name: 'ぺんぺん', score: 200 }
 ];
 
 
 export const QuizResultScreen = (props: QuizResultProps) => {
   const { result } = props;
-
   const router = useRouter();
+  
+  const rank:number = 1; //暫定順位
 
   return (
     <div className="text-center">
-      <h2 className="mb-4 text-2xl font-bold text-green-400">QUIZ COMPLETE!</h2>
-      <p className="text-lg text-white">
-        Score: {result.score} / {result.totalQuestions}
-      </p>
-      <p className="mt-2 text-gray-400">正答率: {result.accuracyPercentage}%</p>
+      <h1 className="font-sixtyfour typing-text text-4xl font-bold text-green-400 md:text-5xl my-5">
+          {rank === 1 ? "CHAMPION" : "GAME OVER"}
+        </h1>
 
 <div className="border-t border-green-700 my-4" />
-      <div className="mb-2 text-green-400 font-bold">FINAL RANKINGS</div>
-      <pre className="bg-black/60 rounded p-4 mb-4">
+      <div className="text-green-400 font-bold">FINAL RANKINGS</div>
+      <pre className="bg-black/60 rounded p-4 mb-3">
         {players.map((player, idx) => (
           <div
             key={player.name}
@@ -47,16 +47,16 @@ export const QuizResultScreen = (props: QuizResultProps) => {
           >
             <span>{rankIcons[idx] || rankIcons[3]}</span>
             <span className="flex-1">{player.name}</span>
-            <span className="ml-2">{player.score} pts</span>
+            <span className="ml-2">{result.score} pts</span>
           </div>
         ))}
       </pre>
 
 
 	  
-      <div className="mt-1">
-        <Button context="game" onClick={() => router.push("/")} label="戻る" />
-        <Button context="game" onClick={() => router.push("/")} label="問題の確認" />
+      <div className="mt-1 flex-col flex gap-3">
+        <Button onClick={() => router.push("/")} shortcutKey={1} label=" cd ~/ && ./home" description="ホームに戻る"/>
+        <Button onClick={() => router.push("/")} shortcutKey={2} label="cat ./question.log" description="問題の確認" />
       </div>
     </div>
   );
