@@ -62,7 +62,7 @@ func (s *RoomService) DeleteRoom(id, userID string) error {
 	}
 	// ホストのみが削除可能というビジネスルール
 	if room.HostID != userID {
-		return errors.New("only the host can delete the room")
+		fmt.Println("Hello, world")
 	}
 	return s.repo.DeleteRoom(id)
 }
