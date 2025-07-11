@@ -1,21 +1,37 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
+import { useCreateRoom } from "@/hooks/api/useCreateRoom";
+import { useJoinRoom } from "@/hooks/api/useJoinRoom";
 
 export const HomeClient = () => {
-  const router = useRouter();
+  const { createRoomAndNavigate } = useCreateRoom();
+  const { joinRoomAndNavigate } = useJoinRoom();
 
-  const handleDisplayMakeModal = useCallback(() => {
+  const handleDisplayMakeModal = useCallback(async () => {
     const roomId = Math.floor(1000 + Math.random() * 9000).toString();
-    router.push(`/room/${roomId}`);
+
+    await createRoomAndNavigate({
+      roomId,
+      settings: {
+        difficulty: "Normal",
+        language: "Python",
+      },
+    });
   }, []);
 
-  const handleDisplayJoinModal = useCallback(() => {
-    console.log("> Starting battle mode...");
-    // TODO: 対戦モード実装時に適切なルートへ遷移
-    alert("対戦モードは準備中です");
+  const handleDisplayJoinModal = useCallback(async () => {
+    const roomId = prompt("参加するルームIDを入力してください:");
+
+    if (!roomId) {
+      alert("ルームIDが入力されませんでした");
+      return;
+    }
+
+    await joinRoomAndNavigate(roomId, {
+      playerName: "user_438e985574fe71edwdwdwdw",
+    });
   }, []);
 
   /**
