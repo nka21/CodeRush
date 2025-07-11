@@ -4,73 +4,56 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-	// "types"パッケージを正しくインポートします
 	"server/src/internal/feature/quiz/types"
 	"sync"
 )
 
-// RoomHub は全ルームの全クライアントを管理します。
-type RoomHub struct {
-	// 各ルームのクライアントを保持します。
-	// キー: roomID, 値: クライアントのセット
-	rooms map[string]map[*Client]bool
-
-	// roomsマップへの同時アクセスを保護します。
-	mu sync.RWMutex
-
-	// クライアントからの登録リクエスト
-	register chan *Client
-
-	// クライアントからの登録解除リクエスト
-	unregister chan *Client
-
-	// 特定のルームへのメッセージブロードキャストリクエスト
-	broadcast chan *types.Message
+// MessageProcessor はクライアントからのメッセージを処理する責務を持つインターフェースです。
+type MessageProcessor interface {
+	ProcessClientMessage(roomID, userID string, message []byte)
 }
 
-// NewRoomHub は新しいRoomHubインスタンスを生成し、実行します。
+type RoomHub struct {
+	rooms      map[string]map[*Client]bool
+	mu         sync.RWMutex
+	Register   chan *Client
+	Unregister chan *Client
+	Broadcast  chan *types.Message
+	Inbound    chan *InboundMessage
+	Processor  MessageProcessor
+}
+
 func NewRoomHub() *RoomHub {
 	return &RoomHub{
 		rooms:      make(map[string]map[*Client]bool),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		broadcast:  make(chan *types.Message),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Broadcast:  make(chan *types.Message),
+		Inbound:    make(chan *InboundMessage),
 	}
 }
 
-// Run はハブのメインループです。チャネルからの要求を待ち受けます。
 func (h *RoomHub) Run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.handleRegister(client)
-		case client := <-h.unregister:
-			h.handleUnregister(client)
-		case message := <-h.broadcast:
-			h.handleBroadcast(message)
+		case client := <-h.Register:
+			h.registerClient(client)
+		case client := <-h.Unregister:
+			h.unregisterClient(client)
+		case message := <-h.Broadcast:
+			h.broadcastMessage(message)
+		case inboundMessage := <-h.Inbound:
+			if h.Processor != nil {
+				client := inboundMessage.Client
+				h.Processor.ProcessClientMessage(client.RoomID, client.UserID, inboundMessage.Message)
+			}
 		}
 	}
 }
 
-// Register はクライアントを登録チャネルに送ります。
-func (h *RoomHub) Register(client *Client) {
-	h.register <- client
-}
-
-// Unregister はクライアントを登録解除チャネルに送ります。
-func (h *RoomHub) Unregister(client *Client) {
-	h.unregister <- client
-}
-
-// Broadcast はメッセージをブロードキャストチャネルに送ります。
-func (h *RoomHub) Broadcast(message *types.Message) {
-	h.broadcast <- message
-}
-
-func (h *RoomHub) handleRegister(client *Client) {
+func (h *RoomHub) registerClient(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
 	roomID := client.RoomID
 	if _, ok := h.rooms[roomID]; !ok {
 		h.rooms[roomID] = make(map[*Client]bool)
@@ -78,20 +61,22 @@ func (h *RoomHub) handleRegister(client *Client) {
 	h.rooms[roomID][client] = true
 	log.Printf("Client %s registered to room %s", client.UserID, roomID)
 
-	// 参加イベントを作成してブロードキャストチャネルに送る
+	// ユーザー参加メッセージをブロードキャスト
 	joinMsg := &types.Message{
 		Type:    "user_joined",
 		Payload: map[string]string{"userId": client.UserID},
 		RoomID:  roomID,
 	}
-	// handleBroadcastを直接呼ぶのではなく、チャネル経由で処理を依頼する
-	go h.Broadcast(joinMsg)
+	// このメソッドはRun goroutineから呼ばれるため、直接broadcastMessageを呼ぶとデッドロックの可能性がある
+	// Broadcastチャネルに送信するのが安全
+	go func() {
+		h.Broadcast <- joinMsg
+	}()
 }
 
-func (h *RoomHub) handleUnregister(client *Client) {
+func (h *RoomHub) unregisterClient(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
 	roomID := client.RoomID
 	if room, ok := h.rooms[roomID]; ok {
 		if _, ok := room[client]; ok {
@@ -103,19 +88,21 @@ func (h *RoomHub) handleUnregister(client *Client) {
 				delete(h.rooms, roomID)
 				log.Printf("Room %s closed", roomID)
 			} else {
-				// 退出イベントを作成してブロードキャストチャネルに送る
+				// ユーザー退出メッセージをブロードキャスト
 				leaveMsg := &types.Message{
 					Type:    "user_left",
 					Payload: map[string]string{"userId": client.UserID},
 					RoomID:  roomID,
 				}
-				go h.Broadcast(leaveMsg)
+				go func() {
+					h.Broadcast <- leaveMsg
+				}()
 			}
 		}
 	}
 }
 
-func (h *RoomHub) handleBroadcast(message *types.Message) {
+func (h *RoomHub) broadcastMessage(message *types.Message) {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
@@ -131,10 +118,11 @@ func (h *RoomHub) handleBroadcast(message *types.Message) {
 			select {
 			case client.Send <- jsonMsg:
 			default:
-				// 送信チャネルが詰まっている場合は、クライアントを強制的に切断
-				// handleUnregisterを直接呼ぶとデッドロックの可能性があるため、
-				// ゴルーチンで安全に実行する
-				go h.Unregister(client)
+				// 送信に失敗した場合（チャネルがブロックされている）、クライアントを切断
+				log.Printf("Client %s send buffer is full. Unregistering.", client.UserID)
+				// ★★★ ここが修正点 ★★★
+				// 関数呼び出しではなくチャネルに送信する
+				h.Unregister <- client
 			}
 		}
 	}
