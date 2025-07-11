@@ -8,9 +8,9 @@ export const HomeClient = () => {
   const router = useRouter();
 
   const handleDisplayMakeModal = useCallback(() => {
-    console.log("> Starting test mode...");
-    router.push("/test");
-  }, [router]);
+    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
+    router.push(`/room/${roomId}`);
+  }, []);
 
   const handleDisplayJoinModal = useCallback(() => {
     console.log("> Starting battle mode...");
