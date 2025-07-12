@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/Button";
+import { JoinModal } from "@/components/JoinModal";
 import { useCreateRoom } from "@/hooks/api/useCreateRoom";
-import { useJoinRoom } from "@/hooks/api/useJoinRoom";
 
 export const HomeClient = () => {
   const { createRoomAndNavigate } = useCreateRoom();
-  const { joinRoomAndNavigate } = useJoinRoom();
+
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const handleDisplayMakeModal = useCallback(async () => {
     const roomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -21,31 +22,30 @@ export const HomeClient = () => {
     });
   }, []);
 
-  const handleDisplayJoinModal = useCallback(async () => {
-    const roomId = prompt("参加するルームIDを入力してください:");
+  const handleDisplayJoinModal = useCallback(() => {
+    setShowJoinModal(true);
+  }, []);
 
-    if (!roomId) {
-      alert("ルームIDが入力されませんでした");
-      return;
-    }
-
-    await joinRoomAndNavigate(roomId, {
-      playerName: "user_438e985574fe71edwdwdwdw",
-    });
+  const handleCloseJoinModal = useCallback(() => {
+    setShowJoinModal(false);
   }, []);
 
   /**
    * キーボードショートカット
+   * モーダルが開いている時は無効化
    */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // モーダルが開いている時はショートカットキーを無効化
+      if (showJoinModal) return;
+
       if (event.key === "1") handleDisplayMakeModal();
       if (event.key === "2") handleDisplayJoinModal();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleDisplayMakeModal, handleDisplayJoinModal]);
+  }, [handleDisplayMakeModal, handleDisplayJoinModal, showJoinModal]);
 
   return (
     <>
@@ -72,6 +72,8 @@ export const HomeClient = () => {
           shortcutKey={2}
         />
       </nav>
+
+      <JoinModal isOpen={showJoinModal} onClose={handleCloseJoinModal} />
     </>
   );
 };

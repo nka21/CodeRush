@@ -35,10 +35,10 @@ export const useJoinRoom = () => {
         router.push(`/room/${room.roomId}`);
       } catch (error) {
         console.error("Error joining room:", error);
-        alert("ルームへの参加に失敗しました");
+        throw error; // エラーを再スローして、呼び出し元で処理できるようにする
       }
     },
-    [],
+    [joinRoom, router],
   );
 
   return {
