@@ -11,6 +11,10 @@ const rankColors = [
   "text-cane-900 font-bold",
 ];
 
+type QuizResultProps = {
+  result: QuizResult;
+};
+
 // ダミーデータ
 // const players = [
 //   {name: 'Player 1', score: 90, rank:1 },
@@ -94,7 +98,7 @@ export const QuizResultScreen = () => {
           description="// 待機画面に戻る"
         />
         <Button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/question_log")}
           shortcutKey={2}
           label="cat ./question.log"
           description="// 問題の確認"
