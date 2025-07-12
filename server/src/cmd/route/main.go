@@ -16,7 +16,7 @@ import (
 
 func main() {
 	cfg := config.Load()
-
+	
 	db, err := database.NewDBHandler(cfg.DBPath)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)

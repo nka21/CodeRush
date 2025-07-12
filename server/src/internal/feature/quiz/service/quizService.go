@@ -30,22 +30,26 @@ func NewQuizService(hub *websocket.RoomHub) *QuizService {
 	}
 }
 
-// StartGame はゲームを開始します。
 func (s *QuizService) StartGame(roomID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	playerIDs := s.hub.GetClientIDs(roomID)
+	initialScores := make(map[string]int)
+	for _, id := range playerIDs {
+		initialScores[id] = 0 // 全員のスコアを0で初期化
+	}
+
 	// 既存のゲームステートがあればリセット
 	newState := &types.GameState{
-		Scores:           make(map[string]int),
+		Scores:           initialScores, // 初期化されたスコアマップを使用
 		AnsweredUsers:    make(map[string]bool),
 		QuestionNumber:   0,
 		IsQuestionActive: false,
 	}
-	s.gameStates[roomID] = newState
 
+	s.gameStates[roomID] = newState
 	log.Printf("Game started in room %s", roomID)
-	// 最初の問題を開始
 	s.nextQuestion(roomID)
 	return nil
 }
@@ -82,7 +86,11 @@ func (s *QuizService) processAnswer(roomID, userID string, payload interface{}) 
 		return
 	}
 
-	state.IsQuestionActive = false
+	// ★ 既に回答済みのユーザーは無視
+	if state.AnsweredUsers[userID] {
+		s.mu.Unlock()
+		return
+	}
 
 	payloadMap, ok := payload.(map[string]interface{})
 	if !ok {
@@ -97,7 +105,9 @@ func (s *QuizService) processAnswer(roomID, userID string, payload interface{}) 
 	}
 	state.AnsweredUsers[userID] = true
 
-    // 重要な変更：ブロードキャストするメッセージを先に作成する
+	// ★ 最初の回答者が来た時点で回答受付終了
+	state.IsQuestionActive = false
+
 	resultMsg := &types.Message{
 		Type: "answer_result",
 		Payload: map[string]interface{}{
@@ -109,18 +119,13 @@ func (s *QuizService) processAnswer(roomID, userID string, payload interface{}) 
 		RoomID: roomID,
 	}
 
-    s.mu.Unlock() // ★ロックを先に解除する
+	s.mu.Unlock()
 
-	// ✅ ここからが修正点 ✅
-	// =================================================================
-	// デッドロックを避けるため、ブロードキャストをゴルーチンで非同期に実行
 	go func() {
 		s.hub.Broadcast <- resultMsg
 	}()
-	// =================================================================
 
-
-	// 3秒後に次の問題へ進む (ローディング画面表示時間)
+	// 3秒後に次の問題へ進む
 	go func() {
 		time.Sleep(3 * time.Second)
 		s.mu.Lock()
@@ -128,7 +133,6 @@ func (s *QuizService) processAnswer(roomID, userID string, payload interface{}) 
 		s.nextQuestion(roomID)
 	}()
 }
-
 
 // nextQuestion は次の問題を出題するか、ゲームを終了します。
 func (s *QuizService) nextQuestion(roomID string) {
@@ -179,8 +183,18 @@ func (s *QuizService) endGame(roomID string) {
 	})
 
 	// ランクを割り当て
-	for i := range results {
-		results[i].Rank = i + 1
+	if len(results) > 0 {
+		// 最初のプレイヤーは必ず1位
+		results[0].Rank = 1
+		for i := 1; i < len(results); i++ {
+			// 前のプレイヤーとスコアが同じ場合、同じ順位にする
+			if results[i].Score == results[i-1].Score {
+				results[i].Rank = results[i-1].Rank
+			} else {
+				// スコアが異なる場合、現在のインデックス+1を順位とする
+				results[i].Rank = i + 1
+			}
+		}
 	}
 
 	message := &types.Message{
@@ -195,6 +209,7 @@ func (s *QuizService) endGame(roomID string) {
 	log.Printf("Game ended in room %s", roomID)
 }
 
+
 // ... (getRandomQuestion, loadDummyQuestions は変更なし)
 func (s *QuizService) getRandomQuestion() *types.Question {
 	if len(s.questions) == 0 {
@@ -208,6 +223,12 @@ func loadDummyQuestions() []types.Question {
 		{ID: "q1", Statement: "Go言語で、パッケージ内の非公開な関数や変数を定義する際の命名規則は？", Choices: []string{"先頭を小文字にする", "先頭を大文字にする", "アンダースコアで始める", "予約語を使う"}, Answer: "先頭を小文字にする"},
 		{ID: "q2", Statement: "HTTPステータスコードで、「Not Found」を意味するのは？", Choices: []string{"200", "301", "404", "500"}, Answer: "404"},
 		{ID: "q3", Statement: "gorilla/websocketパッケージの`Upgrader`の役割は？", Choices: []string{"メッセージの暗号化", "HTTP接続のアップグレード", "クライアントの管理", "エラーハンドリング"}, Answer: "HTTP接続のアップグレード"},
-        // 問題を10問以上用意しておくと良いでしょう
+		{ID: "q4", Statement: "JSONのパースに使用するGoの標準パッケージは？", Choices: []string{"encoding/json", "fmt", "strings", "net/http"}, Answer: "encoding/json"},
+		{ID: "q5", Statement: "Goのgoroutineを開始するキーワードは？", Choices: []string{"go", "async", "thread", "run"}, Answer: "go"},
+		{ID: "q6", Statement: "Goのスライスの長さを取得する関数は？", Choices: []string{"len()", "size()", "length()", "count()"}, Answer: "len()"},
+		{ID: "q7", Statement: "Goのマップを初期化する方法は？", Choices: []string{"make(map[string]int)", "new(map[string]int)", "map[string]int{}", "両方A,C"}, Answer: "両方A,C"},
+		{ID: "q8", Statement: "Goのエラーハンドリングで使用する型は？", Choices: []string{"error", "Error", "exception", "Exception"}, Answer: "error"},
+		{ID: "q9", Statement: "Goのチャネルを作成する関数は？", Choices: []string{"make()", "new()", "create()", "channel()"}, Answer: "make()"},
+		{ID: "q10", Statement: "Goの構造体のフィールドを公開するには？", Choices: []string{"先頭を大文字にする", "先頭を小文字にする", "publicキーワード", "exportキーワード"}, Answer: "先頭を大文字にする"},
 	}
 }
