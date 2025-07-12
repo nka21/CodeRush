@@ -45,9 +45,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
       handleClose();
     } catch (error) {
       console.error("ルーム参加エラー:", error);
-      setErrorMessage(
-        "ルームに参加できませんでした。ルームIDを確認してください。",
-      );
+      setErrorMessage("ルームに参加できませんでした。");
     } finally {
       setIsLoading(false);
     }
