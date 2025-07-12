@@ -140,37 +140,27 @@
       "gameState": "waiting",
       "createdAt": "2025-07-06T08:05:51.418401853Z"
     },
-    "can": {
-      "roomId": "can",
-      "hostId": "user_5df367d5f4fa6514",
+    "fuck": {
+      "roomId": "fuck",
+      "hostId": "user_85cf985b50d85fcb",
       "settings": {
         "difficulty": "Normal",
         "language": "Go"
       },
       "players": {
-        "user_378defa27fb75d8b": {
-          "name": "3",
-          "score": 0,
-          "isReady": false
-        },
-        "user_4b913219e26559ba": {
-          "name": "4",
-          "score": 0,
-          "isReady": false
-        },
-        "user_5a0c978988de7174": {
-          "name": "2",
-          "score": 0,
-          "isReady": false
-        },
-        "user_5df367d5f4fa6514": {
+        "user_85cf985b50d85fcb": {
           "name": "Host",
           "score": 0,
           "isReady": true
+        },
+        "user_9926f7609cb2d2ac": {
+          "name": "2",
+          "score": 0,
+          "isReady": false
         }
       },
       "gameState": "waiting",
-      "createdAt": "2025-07-12T11:04:40.655219322Z"
+      "createdAt": "2025-07-12T12:25:28.541689714Z"
     },
     "gast": {
       "roomId": "gast",
