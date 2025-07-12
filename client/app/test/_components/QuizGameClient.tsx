@@ -145,6 +145,14 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     );
   }
 
+  // if (PageNow === questionLog) {
+  //   return (
+  //     <TerminalLayout cli="--question.log" onTypingComplete={() => {}}>
+  //       <QuizLog />
+  //     </TerminalLayout>
+  //   );
+  // }
+
   // クイズプレイ画面
   return (
     <TerminalLayout cli={commandText} onTypingComplete={handleTypingComplete}>
