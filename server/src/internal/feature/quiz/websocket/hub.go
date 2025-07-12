@@ -4,6 +4,7 @@ package websocket
 import (
 	"encoding/json"
 	"log"
+	"server/src/internal/database"
 	"server/src/internal/feature/quiz/types"
 	"sync"
 )
@@ -21,15 +22,17 @@ type RoomHub struct {
 	Broadcast  chan *types.Message
 	Inbound    chan *InboundMessage
 	Processor  MessageProcessor
+	DBHandler  *database.DBHandler
 }
 
-func NewRoomHub() *RoomHub {
+func NewRoomHub(db *database.DBHandler) *RoomHub {
 	return &RoomHub{
 		rooms:      make(map[string]map[*Client]bool),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Broadcast:  make(chan *types.Message),
 		Inbound:    make(chan *InboundMessage),
+		DBHandler:  db,
 	}
 }
 
@@ -76,24 +79,65 @@ func (h *RoomHub) unregisterClient(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	roomID := client.RoomID
+	userID := client.UserID
+
+	db, err := h.DBHandler.ReadDB()
+	if err != nil {
+		log.Printf("error: failed to read db: %v", err)
+		return
+	}
+
+	roomData, roomExists := db.Rooms[roomID]
+
+	var isHost bool = false
+	if roomExists {
+		hostPlayer, hostPlayerExists := roomData.Players[roomData.HostID]
+		if hostPlayerExists && hostPlayer.Name == userID {
+			isHost = true
+		}
+	}
+
 	if room, ok := h.rooms[roomID]; ok {
 		if _, ok := room[client]; ok {
 			delete(h.rooms[roomID], client)
 			close(client.Send)
-			log.Printf("Client %s unregistered from room %s", client.UserID, roomID)
+			log.Printf("Client %s unregistered from room %s", userID, roomID)
 
-			if len(h.rooms[roomID]) == 0 {
+			if isHost {
+				// --- ホストが退出した場合の処理 ---
+				log.Printf("Host %s has left. Closing room %s.", userID, roomID)
+
+				// ルーム解散メッセージを全員に送信
+				closeMsg := &types.Message{
+					Type:    "room_closed",
+					Payload: map[string]string{"message": "ホストが退出したため、ルームは解散されました。"},
+					RoomID:  roomID,
+				}
+
+				// broadcastMessageはロックを取得するため、デッドロックを避けるためゴルーチンで実行
+				go h.broadcastMessage(closeMsg)
+
+				// DBからルームを削除
+				delete(db.Rooms, roomID)
+				if err := h.DBHandler.WriteDB(db); err != nil {
+					log.Printf("error: failed to write DB after deleting room: %v", err)
+				}
+
+				// サーバー側のルーム情報を削除
+				delete(h.rooms, roomID)
+
+			} else if len(h.rooms[roomID]) == 0 {
+				// --- 最後のユーザーが退出した場合の処理（ホスト以外） ---
 				delete(h.rooms, roomID)
 				log.Printf("Room %s closed", roomID)
 			} else {
+				// --- 通常のユーザーが退出した場合の処理 ---
 				leaveMsg := &types.Message{
 					Type:    "user_left",
-					Payload: map[string]string{"userId": client.UserID},
+					Payload: map[string]string{"userId": userID},
 					RoomID:  roomID,
 				}
-				go func() {
-					h.Broadcast <- leaveMsg
-				}()
+				go h.broadcastMessage(leaveMsg)
 			}
 		}
 	}
