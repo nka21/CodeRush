@@ -6,6 +6,7 @@ import (
 	"server/src/config"
 	"server/src/internal/database"
 	"server/src/internal/feature/quiz"
+	"server/src/internal/feature/quiz/service" // serviceをインポート
 	"server/src/internal/feature/quiz/websocket"
 	"server/src/internal/feature/room"
 
@@ -20,10 +21,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-
-	// WebSocket Hubを生成し、バックグラウンドで実行
-	// 関数名を NewHub から NewRoomHub に修正
+	// WebSocket Hubを生成
 	hub := websocket.NewRoomHub()
+
+	// QuizServiceを生成
+	quizSvc := service.NewQuizService(hub)
+
+	// HubにQuizServiceをMessageProcessorとして設定
+	hub.Processor = quizSvc
+
+	// Hubをバックグラウンドで実行
 	go hub.Run()
 
 	e := echo.New()
@@ -33,11 +40,9 @@ func main() {
 	e.Use(middleware.CORS())
 
 	api := e.Group("/api")
-
-	// 既存のroom機能と新しいquiz機能のルートを登録
-	// これで引数の数が一致する
 	room.RegisterRoutes(api.Group("/room"), db)
-	quiz.RegisterRoutes(api.Group("/quiz"), hub)
+	// quiz.RegisterRoutes に quizSvc を渡す
+	quiz.RegisterRoutes(api.Group("/quiz"), hub, quizSvc)
 
 	log.Println("Server starting on port 8080...")
 	if err := e.Start(":8080"); err != nil {

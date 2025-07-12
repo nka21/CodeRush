@@ -4,34 +4,37 @@ package handler
 import (
 	"log"
 	"net/http"
+	"server/src/internal/feature/quiz/service"
 	"server/src/internal/feature/quiz/websocket"
-
-	// gorilla/websocketパッケージに "ws" という別名を付けます
 	ws "github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
 
-// 別名を付けた "ws" を使ってUpgraderを定義します
 var upgrader = ws.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return true // 開発中はすべてのオリジンを許可
+		return true
 	},
 }
 
-// QuizHandler はWebSocket接続の受付を担当します。
-// ここで使う 'websocket' は、自作した "server/src/internal/feature/quiz/websocket" パッケージを指します。
 type QuizHandler struct {
-	hub *websocket.RoomHub
+	hub     *websocket.RoomHub
+	service *service.QuizService
 }
 
-// NewQuizHandler は新しいQuizHandlerを生成します。
-func NewQuizHandler(hub *websocket.RoomHub) *QuizHandler {
-	return &QuizHandler{hub: hub}
+func NewQuizHandler(hub *websocket.RoomHub, svc *service.QuizService) *QuizHandler {
+	return &QuizHandler{hub: hub, service: svc}
 }
 
-// ServeWs はHTTP接続をWebSocketにアップグレードします。
+func (h *QuizHandler) StartGame(c echo.Context) error {
+	roomID := c.Param("roomId")
+	if err := h.service.StartGame(roomID); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "Game started successfully"})
+}
+
 func (h *QuizHandler) ServeWs(c echo.Context) error {
 	roomID := c.Param("roomId")
 	userID := c.QueryParam("userId")
@@ -46,7 +49,6 @@ func (h *QuizHandler) ServeWs(c echo.Context) error {
 		return err
 	}
 
-	// ここで使う 'websocket' は、自作したパッケージを指します。
 	client := &websocket.Client{
 		Hub:    h.hub,
 		Conn:   conn,
@@ -54,7 +56,7 @@ func (h *QuizHandler) ServeWs(c echo.Context) error {
 		RoomID: roomID,
 		UserID: userID,
 	}
-	h.hub.Register(client) // ハブのメソッド経由で登録
+	h.hub.Register <- client
 
 	go client.WritePump()
 	go client.ReadPump()

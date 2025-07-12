@@ -14,19 +14,22 @@ const (
 	maxMessageSize = 512
 )
 
-// Client は、ハブとWebSocket接続の間の仲介役です。
 type Client struct {
 	Hub    *RoomHub
 	Conn   *websocket.Conn
-	Send   chan []byte // ハブからのメッセージをバッファリングするチャネル
+	Send   chan []byte
 	RoomID string
 	UserID string
 }
 
-// readPump は、クライアントからのメッセージを処理します。
+type InboundMessage struct {
+	Client  *Client
+	Message []byte
+}
+
 func (c *Client) ReadPump() {
 	defer func() {
-		c.Hub.Unregister(c)
+		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
@@ -34,19 +37,17 @@ func (c *Client) ReadPump() {
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 
 	for {
-		// 現時点ではクライアントからのメッセージは読み取るだけで何もしません。
-		// 今後、回答イベントなどをここで受け取ります。
-		_, _, err := c.Conn.ReadMessage()
+		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
+		inboundMessage := &InboundMessage{Client: c, Message: message}
+		c.Hub.Inbound <- inboundMessage
 	}
 }
-
-// writePump は、ハブからのメッセージをクライアントに送信します。
 func (c *Client) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -58,7 +59,6 @@ func (c *Client) WritePump() {
 		case message, ok := <-c.Send:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// ハブがチャネルを閉じた
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

@@ -3,16 +3,18 @@ package quiz
 
 import (
 	"server/src/internal/feature/quiz/handler"
+	"server/src/internal/feature/quiz/service"
 	"server/src/internal/feature/quiz/websocket"
 
 	"github.com/labstack/echo/v4"
 )
 
-// RegisterRoutes はquiz機能のエンドポイントを登録します。
-func RegisterRoutes(g *echo.Group, hub *websocket.RoomHub) {
-	h := handler.NewQuizHandler(hub)
+// シグネチャが (g *echo.Group, hub *websocket.RoomHub, quizSvc *service.QuizService) となっており、
+// main.goでの呼び出しと一致していることを確認します。
+func RegisterRoutes(g *echo.Group, hub *websocket.RoomHub, quizSvc *service.QuizService) {
+	// handlerにserviceを渡す
+	h := handler.NewQuizHandler(hub, quizSvc)
 
-	// WebSocket接続用のエンドポイント
-	// 例: /api/quiz/ws/room123?userId=userABC
 	g.GET("/ws/:roomId", h.ServeWs)
+	g.POST("/start/:roomId", h.StartGame) // ホストがゲームを開始するエンドポイント
 }
