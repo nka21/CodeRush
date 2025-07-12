@@ -8,7 +8,7 @@ const rankColors = [
   "text-yellow-400 font-bold",
   "text-gray-400 font-bold",
   "text-yellow-700 font-bold",
-  "text-cane-900 font-bold",
+  "font-bold",
 ];
 
 type QuizResultScreenProps = {
