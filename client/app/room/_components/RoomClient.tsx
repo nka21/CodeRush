@@ -153,18 +153,11 @@ export const RoomClient = memo((props: RoomClientProps) => {
           context="room"
           shortcutKey={1}
         />
-        <Button
-          label="START_GAME"
-          description="ゲームを開始する"
-          onClick={handleStartGame}
-          context="room"
-          shortcutKey={2}
-        />
         {isHost && (
           <Button
             label="START_GAME"
             description="ゲームを開始する"
-            onClick={() => router.push("/test")}
+            onClick={handleStartGame}
             context="room"
             shortcutKey={2}
           />
