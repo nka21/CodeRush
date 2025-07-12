@@ -2,8 +2,11 @@
 
 import { TerminalLayout } from "@/components/TerminalLayout";
 import { Button } from "@/components/Button";
-import { memo } from "react";
+import { memo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { QuizGameClient } from "../[roomId]/_components/ingame/QuizGameClient";
+import mockData from "../[roomId]/_data/mock.json";
+import type { Question } from "../[roomId]/_types/quiz";
 
 type Player = {
   id: string;
@@ -16,6 +19,9 @@ type Player = {
 type RoomClientProps = {
   roomId: string;
 };
+
+// ゲーム状態の型定義
+type GameState = "lobby" | "ingame" | "complete";
 
 /**
  * プレイヤーカードコンポーネント
@@ -64,6 +70,17 @@ const EmptySlot = memo(() => {
 export const RoomClient = memo((props: RoomClientProps) => {
   const { roomId } = props;
   const router = useRouter();
+  const [gameState, setGameState] = useState<GameState>("lobby");
+
+  // ゲーム開始ハンドラー
+  const handleStartGame = useCallback(() => {
+    setGameState("ingame");
+  }, []);
+
+  // ロビーに戻るハンドラー
+  const handleReturnToLobby = useCallback(() => {
+    setGameState("lobby");
+  }, []);
 
   // モックデータ（実際のAPIから取得する予定）
   const mockPlayers: Player[] = [
@@ -94,6 +111,19 @@ export const RoomClient = memo((props: RoomClientProps) => {
   const maxPlayers = 4;
   const emptySlots = Math.max(0, maxPlayers - mockPlayers.length);
 
+  // ゲーム中の場合、QuizGameClientを表示
+  if (gameState === "ingame") {
+    const questions: Question[] = mockData as Question[];
+    return (
+      <QuizGameClient
+        questions={questions}
+        onGameEnd={handleReturnToLobby}
+        roomId={roomId}
+      />
+    );
+  }
+
+  // ロビー画面
   return (
     <TerminalLayout
       cli={`--room ${roomId}`}
@@ -137,7 +167,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
         <Button
           label="START_GAME"
           description="ゲームを開始する"
-          onClick={() => router.push("/test")}
+          onClick={handleStartGame}
           context="room"
           shortcutKey={2}
         />
