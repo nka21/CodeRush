@@ -8,8 +8,6 @@ import { useRouter } from "next/navigation";
 type Player = {
   id: string;
   name: string;
-  isOnline: boolean;
-  isReady: boolean;
   isHost: boolean;
 };
 
@@ -28,10 +26,7 @@ const PlayerCard = memo((props: { player: Player }) => {
     <div className="flex min-h-[60px] items-center gap-3 rounded-md border border-green-400/20 bg-green-500/5 p-3">
       {/* オンライン状態インジケーター */}
       <div
-        className={`h-2 w-2 rounded-full ${
-          player.isOnline ? "animate-pulse bg-green-500" : "bg-gray-500"
-        }`}
-        aria-label={player.isOnline ? "オンライン" : "オフライン"}
+        className={"h-2 w-2 rounded-full  animate-pulse bg-green-500"}
       />
 
       {/* プレイヤー情報 */}
@@ -70,22 +65,16 @@ export const RoomClient = memo((props: RoomClientProps) => {
     {
       id: "1",
       name: "CodeMaster",
-      isOnline: true,
-      isReady: true,
       isHost: true,
     },
     {
       id: "2",
       name: "DevNinja",
-      isOnline: true,
-      isReady: false,
       isHost: false,
     },
     {
       id: "3",
       name: "BugHunter",
-      isOnline: false,
-      isReady: false,
       isHost: false,
     },
   ];
