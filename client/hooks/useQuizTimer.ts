@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TIMER } from "@/app/test/_constants/quiz";
+import { TIMER } from "@/app/room/[roomId]/_constants/quiz";
 
 type UseQuizTimerProps = {
   onTimeExpired: () => void;

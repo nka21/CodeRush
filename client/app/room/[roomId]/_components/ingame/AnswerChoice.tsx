@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Button } from "@/components/Button";
-import { STYLE_CLASSES } from "../_constants/quiz";
+import { STYLE_CLASSES } from "../../_constants/quiz";
 
 type AnswerChoiceProps = {
   choice: string;

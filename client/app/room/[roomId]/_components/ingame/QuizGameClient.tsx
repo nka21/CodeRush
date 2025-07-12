@@ -1,23 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { TerminalLayout } from "@/components/TerminalLayout";
 import { QuizTimerSection } from "./QuizTimerSection";
 import { CodeDisplay } from "./CodeDisplay";
 import { AnswerChoice } from "./AnswerChoice";
 import { QuizResultScreen } from "./QuizResult";
-import type { Question, QuizResult, AnswerState } from "../_types/quiz";
-import { ANIMATION } from "../_constants/quiz";
+import { QuestionLog } from "../QuestionLog";
+import { Button } from "@/components/Button";
+import type { Question, QuizResult, AnswerState } from "../../_types/quiz";
+import { ANIMATION } from "../../_constants/quiz";
 
 type QuizGameClientProps = {
   questions: Question[];
+  onGameEnd?: () => void;
+  roomId?: string;
 };
 
+// ゲーム状態を詳細に管理
+type GamePhase = "playing" | "result" | "question_log";
+
 export const QuizGameClient = (props: QuizGameClientProps) => {
-  const { questions } = props;
+  const { questions, onGameEnd, roomId } = props;
+  const router = useRouter();
 
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [gamePhase, setGamePhase] = useState<GamePhase>("playing");
 
   // Quiz game state (previously in useQuizGame)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -32,6 +42,12 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
   const handleQuizComplete = useCallback((result: QuizResult) => {
     setQuizResult(result);
+    setGamePhase("result");
+  }, []);
+
+  // QuestionLogに移行する関数
+  const handleShowQuestionLog = useCallback(() => {
+    setGamePhase("question_log");
   }, []);
 
   const handleTypingComplete = useCallback(() => {
@@ -47,6 +63,11 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   );
 
   const moveToNextQuestion = useCallback(() => {
+    // ゲーム終了状態の場合は何もしない
+    if (gamePhase !== "playing") {
+      return;
+    }
+
     const nextIndex = currentQuestionIndex + 1;
 
     if (nextIndex >= questions.length) {
@@ -61,16 +82,22 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
       setCurrentQuestionIndex(nextIndex);
       setAnswerState({ type: "unanswered" });
     }
-  }, [currentQuestionIndex, questions.length, score, handleQuizComplete]);
+  }, [
+    currentQuestionIndex,
+    questions.length,
+    score,
+    handleQuizComplete,
+    gamePhase,
+  ]);
 
   const submitAnswer = useCallback(
     (selectedIndex: number) => {
-      if (hasAnswered || !currentQuestion) return;
+      if (hasAnswered || !currentQuestion || gamePhase !== "playing") return;
 
       setAnswerState({ type: "answered", selectedIndex });
 
       if (checkAnswer(selectedIndex)) {
-        setScore((prev) => prev + 1);
+        setScore((prev) => prev + 10);
       }
 
       // 次の問題へ自動遷移
@@ -78,18 +105,18 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         moveToNextQuestion();
       }, ANIMATION.ANSWER_REVEAL_DELAY_MS);
     },
-    [hasAnswered, currentQuestion, checkAnswer, moveToNextQuestion],
+    [hasAnswered, currentQuestion, checkAnswer, moveToNextQuestion, gamePhase],
   );
 
   const handleTimeExpired = useCallback(() => {
-    if (hasAnswered) return;
+    if (hasAnswered || gamePhase !== "playing") return;
 
     setAnswerState({ type: "time_expired" });
 
     setTimeout(() => {
       moveToNextQuestion();
     }, ANIMATION.ANSWER_REVEAL_DELAY_MS);
-  }, [hasAnswered, moveToNextQuestion]);
+  }, [hasAnswered, moveToNextQuestion, gamePhase]);
 
   const getAnswerChoiceStatus = useCallback(
     (choiceIndex: number) => {
@@ -134,23 +161,55 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     return () => document.removeEventListener("keydown", handleKeyPress);
   }, [hasAnswered, isComplete, submitAnswer]);
 
+  // QuestionLogからロビーに戻る
+  const handleReturnToLobby = useCallback(() => {
+    if (onGameEnd) {
+      onGameEnd();
+    }
+  }, [onGameEnd]);
+
+  // ホームに戻る
+  const handleReturnToHome = useCallback(() => {
+    router.push("/");
+  }, [router]);
+
   // 結果画面
-  if (quizResult) {
+  if (gamePhase === "result" && quizResult) {
     return (
       <TerminalLayout cli="--complete" onTypingComplete={() => {}}>
-        <QuizResultScreen />
+        <QuizResultScreen
+          result={quizResult}
+          onShowQuestionLog={handleShowQuestionLog}
+          onReturnToLobby={handleReturnToLobby}
+        />
       </TerminalLayout>
     );
   }
 
-  // クイズログ画面
-  // if (PageNow === questionLog) {
-  //   return (
-  //     <TerminalLayout cli="--question.log" onTypingComplete={() => {}}>
-  //       <QuizLog />
-  //     </TerminalLayout>
-  //   );
-  // }
+  // QuestionLog画面
+  if (gamePhase === "question_log") {
+    return (
+      <TerminalLayout cli="--question.log" onTypingComplete={() => {}}>
+        <div className="max-h-[60vh] space-y-4 overflow-y-auto">
+          <QuestionLog />
+          <div className="my-5 flex gap-3">
+            <Button
+              onClick={handleReturnToLobby}
+              shortcutKey={1}
+              label="cd ~/ && ./room"
+              description="// 待機画面に戻る"
+            />
+            <Button
+              onClick={handleReturnToHome}
+              shortcutKey={2}
+              label="cd ~/ && ./home"
+              description="// ホームに戻る"
+            />
+          </div>
+        </div>
+      </TerminalLayout>
+    );
+  }
 
   // クイズプレイ画面
   return (

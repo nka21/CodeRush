@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { TIMER } from "../_constants/quiz";
+import { TIMER } from "../../_constants/quiz";
 
 type TimerProgressBarProps = {
   progress: number; // 0〜1の範囲
