@@ -11,10 +11,6 @@ const rankColors = [
   "text-cane-900 font-bold",
 ];
 
-type QuizResultProps = {
-  result: QuizResult;
-};
-
 // ダミーデータ
 // const players = [
 //   {name: 'Player 1', score: 90, rank:1 },
