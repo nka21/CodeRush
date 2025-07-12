@@ -57,8 +57,8 @@ export const QuizResultScreen = (props: QuizResultProps) => {
 
 	  
       <div className="mt-1 flex-col flex gap-3">
-        <Button onClick={() => router.push("/")} shortcutKey={1} label="cd ~/ && ./home" description="ホームに戻る"/>
-        <Button onClick={() => router.push("/")} shortcutKey={2} label="cat ./question.log" description="問題の確認" />
+        <Button onClick={() => router.push("/")} shortcutKey={1} label="cd ~/ && ./room" description="// 待機画面に戻る"/>
+        <Button onClick={() => router.push("/")} shortcutKey={2} label="cat ./question.log" description="// 問題の確認" />
       </div>
     </div>
   );
