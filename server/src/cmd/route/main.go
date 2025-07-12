@@ -16,13 +16,13 @@ import (
 
 func main() {
 	cfg := config.Load()
-	
+
 	db, err := database.NewDBHandler(cfg.DBPath)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	// WebSocket Hubを生成
-	hub := websocket.NewRoomHub()
+	hub := websocket.NewRoomHub(db)
 
 	// QuizServiceを生成
 	quizSvc := service.NewQuizService(hub)
@@ -40,6 +40,10 @@ func main() {
 	e.Use(middleware.CORS())
 
 	api := e.Group("/api")
+
+    api.GET("/", func(c echo.Context) error {
+        return c.String(200, "OK")
+    })
 	room.RegisterRoutes(api.Group("/room"), db)
 	// quiz.RegisterRoutes に quizSvc を渡す
 	quiz.RegisterRoutes(api.Group("/quiz"), hub, quizSvc)
