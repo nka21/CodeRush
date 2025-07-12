@@ -1,27 +1,48 @@
 "use client";
 
 import { useTypingAnimation } from "@/hooks/useTypingAnimation";
+import { usePathname } from "next/navigation";
 import React, { memo, useEffect, useState } from "react";
 
 type TerminalHeaderProps = {
   title: string;
+  roomId?: string;
 };
 
 const TerminalHeader = memo((props: TerminalHeaderProps) => {
-  const { title } = props;
+  const { title, roomId } = props;
+  const pathname = usePathname();
 
   return (
-    <header className="flex items-center gap-2 border-b border-[#333] bg-[#2d2d2d] px-5 py-3">
-      <div className="h-3 w-3 rounded-full bg-red-500" aria-label="Close" />
-      <div
-        className="h-3 w-3 rounded-full bg-yellow-500"
-        aria-label="Minimize"
-      />
-      <div
-        className="h-3 w-3 rounded-full bg-green-500"
-        aria-label="Maximize"
-      />
-      <div className="ml-2 text-sm text-white opacity-80">{title}</div>
+    <header className="flex items-center justify-between border-b border-[#333] bg-[#2d2d2d] px-5 py-3">
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 rounded-full bg-red-500" aria-label="Close" />
+        <div
+          className="h-3 w-3 rounded-full bg-yellow-500"
+          aria-label="Minimize"
+        />
+        <div
+          className="h-3 w-3 rounded-full bg-green-500"
+          aria-label="Maximize"
+        />
+        <div className="ml-2 text-sm text-white opacity-80">{title}</div>
+      </div>
+      {pathname.startsWith("/room") && (
+        <div className="flex items-center gap-5 text-sm">
+          <div className="flex items-center gap-2 text-[#00ff00]">
+            <div className="rounded-[3px] bg-[#333] px-2 py-1">
+              {roomId || "----"}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-gray-400">
+            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
+            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-gray-700"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-gray-700"></div>
+            <span>3/4</span>
+          </div>
+        </div>
+      )}
     </header>
   );
 });
@@ -48,6 +69,7 @@ type TerminalLayoutProps = {
   title?: string;
   currentPath?: string;
   cli?: string;
+  roomId?: string;
   onTypingComplete?: () => void;
 };
 
@@ -57,6 +79,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
     title = "code-rush@progate",
     currentPath = "aws@progate",
     cli,
+    roomId,
     onTypingComplete,
   } = props;
 
@@ -95,7 +118,7 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   return (
     <div className="font-cascadia relative flex min-h-screen items-center justify-center overflow-hidden">
       <main className="relative z-20 max-h-[90vh] w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_0px_42px_rgba(0,255,65,0.1)]">
-        <TerminalHeader title={title} />
+        <TerminalHeader title={title} roomId={roomId} />
 
         <section className="relative flex min-h-96 flex-1 flex-col bg-black p-8 text-green-400">
           <div className="mb-2 flex flex-col items-start sm:flex-row sm:items-center">
