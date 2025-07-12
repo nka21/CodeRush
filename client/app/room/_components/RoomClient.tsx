@@ -25,9 +25,7 @@ const PlayerCard = memo((props: { player: Player }) => {
   return (
     <div className="flex min-h-[60px] items-center gap-3 rounded-md border border-green-400/20 bg-green-500/5 p-3">
       {/* オンライン状態インジケーター */}
-      <div
-        className={"h-2 w-2 rounded-full  animate-pulse bg-green-500"}
-      />
+      <div className={"h-2 w-2 animate-pulse rounded-full bg-green-500"} />
 
       {/* プレイヤー情報 */}
       <div className="flex-1">
@@ -79,6 +77,8 @@ export const RoomClient = memo((props: RoomClientProps) => {
     },
   ];
 
+  const isHost = mockPlayers.some((player) => player.isHost); //将来的にはpropsからisHostを確認する
+
   // 最大4人まで表示するため、空きスロットを計算
   const maxPlayers = 4;
   const emptySlots = Math.max(0, maxPlayers - mockPlayers.length);
@@ -123,13 +123,15 @@ export const RoomClient = memo((props: RoomClientProps) => {
           context="room"
           shortcutKey={1}
         />
-        <Button
-          label="START_GAME"
-          description="ゲームを開始する"
-          onClick={() => router.push("/test")}
-          context="room"
-          shortcutKey={2}
-        />
+        {isHost && (
+          <Button
+            label="START_GAME"
+            description="ゲームを開始する"
+            onClick={() => router.push("/test")}
+            context="room"
+            shortcutKey={2}
+          />
+        )}
       </div>
     </TerminalLayout>
   );
