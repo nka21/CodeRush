@@ -125,3 +125,16 @@ func (h *RoomHub) broadcastMessage(message *types.Message) {
 		}
 	}
 }
+
+func (h *RoomHub) GetClientIDs(roomID string) []string {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	var userIDs []string
+	if room, ok := h.rooms[roomID]; ok {
+		for client := range room {
+			userIDs = append(userIDs, client.UserID)
+		}
+	}
+	return userIDs
+}
