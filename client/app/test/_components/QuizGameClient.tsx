@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { TerminalLayout } from "@/components/TerminalLayout";
 import { QuizTimerSection } from "./QuizTimerSection";
 import { CodeDisplay } from "./CodeDisplay";
@@ -17,7 +16,6 @@ type QuizGameClientProps = {
 export const QuizGameClient = (props: QuizGameClientProps) => {
   const { questions } = props;
 
-  const router = useRouter();
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
 
@@ -140,7 +138,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   if (quizResult) {
     return (
       <TerminalLayout cli="--complete" onTypingComplete={() => {}}>
-        <QuizResultScreen result={quizResult} />
+        <QuizResultScreen />
       </TerminalLayout>
     );
   }
