@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-type ButtonContext = "home" | "game";
+type ButtonContext = "home" | "game" | "room";
 
 type Props = {
   context?: ButtonContext;
