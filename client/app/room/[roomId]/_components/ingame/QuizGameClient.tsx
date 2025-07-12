@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { TerminalLayout } from "@/components/TerminalLayout";
 import { QuizTimerSection } from "./QuizTimerSection";
 import { CodeDisplay } from "./CodeDisplay";
@@ -22,6 +23,7 @@ type GamePhase = "playing" | "result" | "question_log";
 
 export const QuizGameClient = (props: QuizGameClientProps) => {
   const { questions, onGameEnd, roomId } = props;
+  const router = useRouter();
 
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
@@ -166,6 +168,11 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     }
   }, [onGameEnd]);
 
+  // ホームに戻る
+  const handleReturnToHome = useCallback(() => {
+    router.push("/");
+  }, [router]);
+
   // 結果画面
   if (gamePhase === "result" && quizResult) {
     return (
@@ -193,7 +200,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
               description="// 待機画面に戻る"
             />
             <Button
-              onClick={handleReturnToLobby}
+              onClick={handleReturnToHome}
               shortcutKey={2}
               label="cd ~/ && ./home"
               description="// ホームに戻る"
