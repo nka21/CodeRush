@@ -1,35 +1,51 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/Button";
+import { JoinModal } from "@/components/JoinModal";
+import { useCreateRoom } from "@/hooks/api/useCreateRoom";
 
 export const HomeClient = () => {
-  const router = useRouter();
+  const { createRoomAndNavigate } = useCreateRoom();
 
-  const handleDisplayMakeModal = useCallback(() => {
-    console.log("> Starting test mode...");
-    router.push("/test");
-  }, [router]);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+
+  const handleDisplayMakeModal = useCallback(async () => {
+    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
+
+    await createRoomAndNavigate({
+      roomId,
+      settings: {
+        difficulty: "Normal",
+        language: "Python",
+      },
+    });
+  }, []);
 
   const handleDisplayJoinModal = useCallback(() => {
-    console.log("> Starting battle mode...");
-    // TODO: 対戦モード実装時に適切なルートへ遷移
-    alert("対戦モードは準備中です");
+    setShowJoinModal(true);
+  }, []);
+
+  const handleCloseJoinModal = useCallback(() => {
+    setShowJoinModal(false);
   }, []);
 
   /**
    * キーボードショートカット
+   * モーダルが開いている時は無効化
    */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // モーダルが開いている時はショートカットキーを無効化
+      if (showJoinModal) return;
+
       if (event.key === "1") handleDisplayMakeModal();
       if (event.key === "2") handleDisplayJoinModal();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleDisplayMakeModal, handleDisplayJoinModal]);
+  }, [handleDisplayMakeModal, handleDisplayJoinModal, showJoinModal]);
 
   return (
     <>
@@ -56,6 +72,8 @@ export const HomeClient = () => {
           shortcutKey={2}
         />
       </nav>
+
+      <JoinModal isOpen={showJoinModal} onClose={handleCloseJoinModal} />
     </>
   );
 };

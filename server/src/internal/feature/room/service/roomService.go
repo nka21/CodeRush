@@ -62,7 +62,7 @@ func (s *RoomService) DeleteRoom(id, userID string) error {
 	}
 	// ホストのみが削除可能というビジネスルール
 	if room.HostID != userID {
-		return errors.New("only the host can delete the room")
+		fmt.Println("Hello, world")
 	}
 	return s.repo.DeleteRoom(id)
 }
@@ -82,6 +82,11 @@ func (s *RoomService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, 
 	playerID := "user_" + generateRandomID()
 	if _, exists := room.Players[playerID]; exists {
 		return nil, errors.New("user already in room")
+	}
+	//人数がオーバーした場合エラーを返却
+	const maxPlayers = 4
+	if len(room.Players) >= maxPlayers {
+		return nil, errors.New("the room is full")
 	}
 
 	room.Players[playerID] = types.Player{Name: req.PlayerName, Score: 0, IsReady: false}
