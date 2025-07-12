@@ -98,6 +98,8 @@ export const RoomClient = memo((props: RoomClientProps) => {
     <TerminalLayout
       cli={`--room ${roomId}`}
       roomId={roomId}
+      currentParticipants={mockPlayers.length}
+      maxParticipants={maxPlayers}
       onTypingComplete={() => {}}
     >
       {/* プレイヤーリストセクション */}

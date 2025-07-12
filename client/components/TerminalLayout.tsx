@@ -7,10 +7,12 @@ import React, { memo, useEffect, useState } from "react";
 type TerminalHeaderProps = {
   title: string;
   roomId?: string;
+  currentParticipants?: number;
+  maxParticipants?: number;
 };
 
 const TerminalHeader = memo((props: TerminalHeaderProps) => {
-  const { title, roomId } = props;
+  const { title, roomId, currentParticipants, maxParticipants } = props;
   const pathname = usePathname();
 
   return (
@@ -70,6 +72,8 @@ type TerminalLayoutProps = {
   currentPath?: string;
   cli?: string;
   roomId?: string;
+  currentParticipants?: number;
+  maxParticipants?: number;
   onTypingComplete?: () => void;
 };
 
@@ -80,6 +84,8 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
     currentPath = "aws@progate",
     cli,
     roomId,
+    currentParticipants,
+    maxParticipants,
     onTypingComplete,
   } = props;
 
@@ -118,7 +124,12 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
   return (
     <div className="font-cascadia relative flex min-h-screen items-center justify-center overflow-hidden">
       <main className="relative z-20 max-h-[90vh] w-[90%] max-w-2xl overflow-hidden rounded-xl border border-[#333] bg-gray-900 p-0 shadow-[0_0px_42px_rgba(0,255,65,0.1)]">
-        <TerminalHeader title={title} roomId={roomId} />
+        <TerminalHeader
+          title={title}
+          roomId={roomId}
+          currentParticipants={currentParticipants}
+          maxParticipants={maxParticipants}
+        />
 
         <section className="relative flex min-h-96 flex-1 flex-col bg-black p-8 text-green-400">
           <div className="mb-2 flex flex-col items-start sm:flex-row sm:items-center">
