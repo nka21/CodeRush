@@ -10,25 +10,23 @@ export default function QuestionLogPage() {
 
   return (
     <TerminalLayout cli="--question.log">
-      <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-
+      <div className="max-h-[60vh] space-y-4 overflow-y-auto">
         <QuestionLog />
-      <div className="my-5 flex gap-3">
-        <Button
-          onClick={() => router.push(`/room/${roomid}`)}
-          shortcutKey={1}
-          label="cd ~/ && ./room"
-          description="// 待機画面に戻る"
-        />
-        <Button
-          onClick={() => router.push("/")}
-          shortcutKey={2}
-          label="cd ~/ && ./home"
-          description="// ホームに戻る"
-        />
+        <div className="my-5 flex gap-3">
+          <Button
+            onClick={() => router.push("/room/42")}
+            shortcutKey={1}
+            label="cd ~/ && ./room"
+            description="// 待機画面に戻る"
+          />
+          <Button
+            onClick={() => router.push("/")}
+            shortcutKey={2}
+            label="cd ~/ && ./home"
+            description="// ホームに戻る"
+          />
         </div>
       </div>
-
     </TerminalLayout>
   );
 }
