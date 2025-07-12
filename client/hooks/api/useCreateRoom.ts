@@ -31,7 +31,7 @@ export const useCreateRoom = () => {
         alert("ルームの作成に失敗しました");
       }
     },
-    [],
+    [createRoom, router],
   );
 
   return {
