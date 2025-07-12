@@ -142,6 +142,13 @@ export const JoinModal = memo((props: JoinModalProps) => {
 
         <div className="flex gap-3">
           <button
+            onClick={handleClose}
+            disabled={isLoading}
+            className="flex-1 cursor-pointer rounded-md border border-gray-400/30 bg-gray-500/20 px-4 py-2 text-gray-400 transition-colors hover:border-gray-400/50 hover:bg-gray-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            キャンセル
+          </button>
+          <button
             onClick={handleJoinRoom}
             disabled={isJoinButtonDisabled}
             className={`flex-1 rounded-md border px-4 py-2 transition-colors ${
@@ -151,13 +158,6 @@ export const JoinModal = memo((props: JoinModalProps) => {
             }`}
           >
             {isLoading ? "参加中..." : "参加"}
-          </button>
-          <button
-            onClick={handleClose}
-            disabled={isLoading}
-            className="flex-1 cursor-pointer rounded-md border border-gray-400/30 bg-gray-500/20 px-4 py-2 text-gray-400 transition-colors hover:border-gray-400/50 hover:bg-gray-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            キャンセル
           </button>
         </div>
       </div>
