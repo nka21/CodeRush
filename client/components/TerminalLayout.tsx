@@ -37,11 +37,24 @@ const TerminalHeader = memo((props: TerminalHeaderProps) => {
             </div>
           </div>
           <div className="flex items-center gap-1 text-gray-400">
-            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
-            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-gray-700"></div>
-            <div className="h-1.5 w-1.5 rounded-full bg-gray-700"></div>
-            <span>3/4</span>
+            {/* 参加者数分の緑色ドット（アニメーション付き） */}
+            {Array.from({ length: currentParticipants ?? 0 }, (_, index) => (
+              <div
+                key={`active-${index}`}
+                className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"
+              />
+            ))}
+            {/* 残りのスロット分の灰色ドット */}
+            {Array.from(
+              { length: (maxParticipants ?? 4) - (currentParticipants ?? 0) },
+              (_, index) => (
+                <div
+                  key={`empty-${index}`}
+                  className="h-1.5 w-1.5 rounded-full bg-gray-700"
+                />
+              ),
+            )}
+            <span>{`${currentParticipants ?? 0}/${maxParticipants ?? 4}`}</span>
           </div>
         </div>
       )}
