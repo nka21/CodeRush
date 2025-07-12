@@ -97,7 +97,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
       setAnswerState({ type: "answered", selectedIndex });
 
       if (checkAnswer(selectedIndex)) {
-        setScore((prev) => prev + 1);
+        setScore((prev) => prev + 10);
       }
 
       // 次の問題へ自動遷移
