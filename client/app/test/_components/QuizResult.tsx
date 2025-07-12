@@ -59,11 +59,11 @@ export const QuizResultScreen = (props: QuizResultProps) => {
 
   const myId = "Player 1"; //情報受け取り必要
   const myPlayer = players.find((player) => player.name === myId);
-
+  
   if (!myPlayer) {
-  console.error("自分のプレイヤーデータが見つかりません");
-  return null;
-}
+    console.error("自分のプレイヤーデータが見つかりません");
+    return null;
+  }
   const myRank:number = myPlayer.rank;
   
   return (
@@ -91,7 +91,7 @@ export const QuizResultScreen = (props: QuizResultProps) => {
 	  
       <div className="mt-1 flex-col flex gap-3">
         <Button onClick={() => router.push("/")} shortcutKey={1} label="cd ~/ && ./room" description="// 待機画面に戻る"/>
-        <Button onClick={() => router.push("/")} shortcutKey={2} label="cat ./question.log" description="// 問題の確認" />
+        <Button onClick={() => router.push("/question_log")} shortcutKey={2} label="cat ./question.log" description="// 問題の確認" />
       </div>
     </div>
   );
