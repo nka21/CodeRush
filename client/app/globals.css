@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sixtyfour: var(--font-sixtyfour);
 }
 
 body {
-  background: var(--background);
+  background: #171717;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Cascadia Mono", monospace, Arial, Helvetica, sans-serif;
+}
+
+.font-cascadia {
+  font-family: "Cascadia Mono", monospace;
+}
+
+/* ===== ターミナルアニメーション定義 ===== */
+
+/* メインタイトル「CODE RUSH」のタイピング効果 */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* メインタイトル右側のカーソル点滅効果 */
+@keyframes blink {
+  0%,
+  50% {
+    border-color: #00ff41;
+  }
+  51%,
+  100% {
+    border-color: transparent;
+  }
+}
+
+/* プロンプト行のカーソル点滅効果 */
+@keyframes cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* メインタイトルのグリッチ（画面ノイズ）効果 */
+@keyframes glitch {
+  0% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(-2px);
+  }
+  20% {
+    transform: translateX(2px);
+  }
+  30% {
+    transform: translateX(-2px);
+  }
+  40% {
+    transform: translateX(2px);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* メニューアイテムの左からスライドイン効果 */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== ターミナルUIコンポーネント ===== */
+
+/* メインタイトル「CODE RUSH」: タイピング効果 + 右端カーソル点滅 */
+.typing-text {
+  overflow: hidden;
+  border-right: 2px solid #00ff41;
+  animation:
+    typing 3s steps(20, end),
+    blink 1s step-end infinite;
+}
+
+/* プロンプト行のカーソル: 緑色の縦線が点滅 */
+.cursor {
+  display: inline-block;
+  background: #00ff41;
+  width: 2px;
+  height: 1.2rem;
+  animation: cursor-blink 1s infinite;
+}
+
+/* メインタイトルのグリッチ効果: 微細な横揺れでノイズ感演出 */
+.glitch {
+  animation: glitch 2s infinite;
+}
+
+/* ===== メニューアイテムのアニメーション ===== */
+
+/* メニューアイテム基本: 左からスライドイン */
+.menu-item {
+  animation: fadeInSlide 0.5s ease forwards;
+}
+
+/* 1番目のメニュー: 0.9秒後に表示開始 */
+.menu-item:nth-child(1) {
+  animation-delay: 3s;
+}
+
+/* 2番目のメニュー: 1.1秒後に表示開始 */
+.menu-item:nth-child(2) {
+  animation-delay: 3.2s;
+}
+
+/* メニューホバー時の光沢効果: 左から右へ光が流れる */
+.menu-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 136, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+/* ホバー時: 光沢が左から右へ移動 */
+.menu-item:hover::before {
+  left: 100%;
+}
+
+/* ===== クイズ用アニメーション ===== */
+
+/* 不正解時の振動アニメーション */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
 }

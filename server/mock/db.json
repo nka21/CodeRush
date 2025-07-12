@@ -123,23 +123,6 @@
       "gameState": "waiting",
       "createdAt": "2025-07-11T06:45:13.53587505Z"
     },
-    "AWS": {
-      "roomId": "AWS",
-      "hostId": "user_8178db337ea2a3d1",
-      "settings": {
-        "difficulty": "Normal",
-        "language": "Python"
-      },
-      "players": {
-        "user_8178db337ea2a3d1": {
-          "name": "Host",
-          "score": 0,
-          "isReady": true
-        }
-      },
-      "gameState": "waiting",
-      "createdAt": "2025-07-06T04:01:26.383468001Z"
-    },
     "MY-ROOM-123": {
       "roomId": "MY-ROOM-123",
       "hostId": "user_190e03f7031dd1b9",
@@ -149,6 +132,23 @@
       },
       "players": {
         "user_190e03f7031dd1b9": {
+          "name": "Host",
+          "score": 0,
+          "isReady": true
+        }
+      },
+      "gameState": "waiting",
+      "createdAt": "2025-07-06T08:05:51.418401853Z"
+    },
+    "wstest": {
+      "roomId": "wstest",
+      "hostId": "user_ed1dff1babc4d9e9",
+      "settings": {
+        "difficulty": "Normal",
+        "language": "Python"
+      },
+      "players": {
+        "user_ed1dff1babc4d9e9": {
           "name": "Host",
           "score": 0,
           "isReady": true

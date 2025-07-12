@@ -21,11 +21,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-
 	// WebSocket Hubを生成
 	hub := websocket.NewRoomHub()
 
-	// ★★★ ここから修正 ★★★
 	// QuizServiceを生成
 	quizSvc := service.NewQuizService(hub)
 
@@ -42,11 +40,9 @@ func main() {
 	e.Use(middleware.CORS())
 
 	api := e.Group("/api")
-
 	room.RegisterRoutes(api.Group("/room"), db)
 	// quiz.RegisterRoutes に quizSvc を渡す
 	quiz.RegisterRoutes(api.Group("/quiz"), hub, quizSvc)
-	// ★★★ ここまで修正 ★★★
 
 	log.Println("Server starting on port 8080...")
 	if err := e.Start(":8080"); err != nil {

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "difficulty": "easy",
+    "code": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Piscine42\";\n    printf(\"%c\\n\", *(str + 4));\n    return 0;\n}",
+    "choices": ["P", "i", "n", "e"],
+    "correctAnswer": 1
+  },
+  {
+    "id": 2,
+    "difficulty": "medium",
+    "code": "#include <stdio.h>\n\nint main() {\n    char *s = \"hello\";\n    s[0] = 'H';\n    printf(\"%s\\n\", s);\n    return 0;\n}",
+    "choices": ["Hello", "hello", "Segmentation fault", "Compilation error"],
+    "correctAnswer": 2
+  },
+  {
+    "id": 3,
+    "difficulty": "medium",
+    "code": "#include <stdio.h>\n\nvoid f() {\n    static int n = 0;\n    n++;\n    printf(\"%d \", n);\n}\n\nint main() {\n    f(); f(); f();\n    return 0;\n}",
+    "choices": ["1 1 1", "1 2 3", "0 1 2", "3 3 3"],
+    "correctAnswer": 1
+  },
+  {
+    "id": 4,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    int *p = arr;\n    printf(\"%d\\n\", *(p + 2));\n    return 0;\n}",
+    "choices": ["1", "2", "3", "4"],
+    "correctAnswer": 2
+  },
+  {
+    "id": 5,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p1 = &a;\n    int **p2 = &p1;\n    printf(\"%d\\n\", **p2);\n    return 0;\n}",
+    "choices": ["Address of a", "Address of p1", "10", "Compilation error"],
+    "correctAnswer": 2
+  },
+  {
+	"id": 6,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nint main() {\n    int x = 5;\n    printf(\"%d\\n\", x++);\n    return 0;\n}",
+    "choices": ["5", "6", "Compilation error", "Undefined behavior"],
+    "correctAnswer": 0
+  },
+  {
+	"id": 7,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nint main() {\n    printf(\"%zu\\n\", sizeof(\"hello!\"));\n    return 0;\n}",
+    "choices": ["5", "6", "7", "8"],
+    "correctAnswer": 2
+  },
+  {
+	"id": 8,
+    "difficulty": "medium",
+    "code": "#include <stdio.h>\n\nint main() {\n    char s1[] = \"world\";\n    char *s2 = \"world\";\n    if (s1 == s2) {\n        printf(\"Same\");\n    } else {\n        printf(\"Different\");\n    }\n    return 0;\n}",
+    "choices": ["Same", "Different", "Compilation error", "Undefined behavior"],
+    "correctAnswer": 1
+  },
+  {
+	"id": 9,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10, y = 20;\n    swap(&x, &y);\n    printf(\"%d %d\\n\", x, y);\n    return 0;\n}",
+    "choices": ["10 20", "20 10", "10 10", "20 20"],
+    "correctAnswer": 1
+  },
+  {
+	"id": 10,
+    "difficulty": "hard",
+    "code": "#include <stdio.h>\n\nint main() {\n    int i = 0;\n    int result = i++ + ++i;\n    printf(\"%d\\n\", result);\n    return 0;\n}",
+    "choices": ["0", "1", "2", "Undefined behavior"],
+    "correctAnswer": 3
+  }
+]

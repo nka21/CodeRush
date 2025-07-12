@@ -4,7 +4,6 @@ package websocket
 import (
 	"log"
 	"time"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -49,7 +48,6 @@ func (c *Client) ReadPump() {
 		c.Hub.Inbound <- inboundMessage
 	}
 }
-
 func (c *Client) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -64,6 +62,7 @@ func (c *Client) WritePump() {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return

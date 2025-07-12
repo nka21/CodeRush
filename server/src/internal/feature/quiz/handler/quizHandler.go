@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"server/src/internal/feature/quiz/service"
 	"server/src/internal/feature/quiz/websocket"
-
 	ws "github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )

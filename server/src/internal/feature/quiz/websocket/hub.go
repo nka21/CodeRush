@@ -60,8 +60,6 @@ func (h *RoomHub) registerClient(client *Client) {
 	}
 	h.rooms[roomID][client] = true
 	log.Printf("Client %s registered to room %s", client.UserID, roomID)
-
-	// ユーザー参加メッセージをブロードキャスト
 	joinMsg := &types.Message{
 		Type:    "user_joined",
 		Payload: map[string]string{"userId": client.UserID},
@@ -88,7 +86,6 @@ func (h *RoomHub) unregisterClient(client *Client) {
 				delete(h.rooms, roomID)
 				log.Printf("Room %s closed", roomID)
 			} else {
-				// ユーザー退出メッセージをブロードキャスト
 				leaveMsg := &types.Message{
 					Type:    "user_left",
 					Payload: map[string]string{"userId": client.UserID},
@@ -123,6 +120,7 @@ func (h *RoomHub) broadcastMessage(message *types.Message) {
 				// ★★★ ここが修正点 ★★★
 				// 関数呼び出しではなくチャネルに送信する
 				h.Unregister <- client
+
 			}
 		}
 	}

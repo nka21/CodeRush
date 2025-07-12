@@ -1,107 +1,16 @@
-"use client";
-import { useState } from "react";
-import { RoomButton } from "./_components/RoomButton";
-import { Modal } from "./_components/Modal";
-
-const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"] as const;
-type Difficulty = (typeof DIFFICULTY_LEVELS)[number];
-
-const QUIZ_LANGUAGES = [
-  "C",
-  "Python",
-  "Java",
-  "Go",
-  "JavaScript",
-  "C++",
-  "C#",
-] as const;
-type QuizLanguage = (typeof QUIZ_LANGUAGES)[number];
+import { TerminalLayout } from "@/components/TerminalLayout";
+import { HomeClient } from "./_components/HomeClient";
 
 export default function Home() {
-  const [modal, setModal] = useState<string | null>(null);
-
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState<Difficulty>("Normal");
-  const [selectedGenre, setSelectedGenre] = useState<QuizLanguage>("C");
-
   return (
-    <div className="text-center">
-      <h1 className="mb-8 py-25 text-7xl font-bold">Code Rush!</h1>
-      <div className="flex items-center justify-center gap-20">
-        <RoomButton onClick={() => setModal("make")} variant="作成" />
-        <RoomButton onClick={() => setModal("join")} variant="参加" />
+    <TerminalLayout cli="--init">
+      <div className="glitch my-4">
+        <h1 className="font-sixtyfour typing-text text-4xl font-bold text-green-400 md:text-5xl">
+          CODE RUSH
+        </h1>
       </div>
 
-      <Modal isOpen={modal === "make"} onClose={() => setModal(null)}>
-        <h2 className="mb-4 text-2xl font-bold">部屋を作成します</h2>
-        <p className="mb-2">
-          新しい対戦部屋を作成します。難易度とジャンルを選んでください。
-        </p>
-
-        {/* 難易度選択 */}
-        <p className="mt-4 mb-2">難易度を選択：</p>
-        <div className="mb-6 flex justify-center gap-4">
-          {DIFFICULTY_LEVELS.map((level) => (
-            <button
-              key={level}
-              onClick={() => setSelectedDifficulty(level as Difficulty)}
-              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                selectedDifficulty === level
-                  ? "bg-blue-600 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {level}
-            </button>
-          ))}
-        </div>
-
-        {/* ジャンル選択 */}
-        <p className="mb-2">ジャンルを選択：</p>
-        <div className="mb-6 flex flex-wrap justify-center gap-3">
-          {QUIZ_LANGUAGES.map((language) => (
-            <button
-              key={language}
-              onClick={() => setSelectedGenre(language)}
-              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                selectedGenre === language
-                  ? "bg-green-600 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {language}
-            </button>
-          ))}
-        </div>
-
-        {/* 決定ボタン */}
-        <button
-          onClick={() => {
-            console.log("部屋作成: 難易度 =", selectedDifficulty);
-            console.log("ジャンル =", selectedGenre);
-            setModal(null);
-          }}
-          className="mt-6 rounded-md bg-blue-500 px-4 py-2 text-white"
-        >
-          決定
-        </button>
-      </Modal>
-
-      <Modal isOpen={modal === "join"} onClose={() => setModal(null)}>
-        <h2 className="mb-4 text-2xl font-bold">部屋に参加します</h2>
-        <p>参加コードを入力してください。</p>
-        <input
-          type="text"
-          className="mt-2 w-full rounded-md border-2 border-gray-300 p-2"
-          placeholder="例: ABCD"
-        />
-        <button
-          onClick={() => setModal(null)}
-          className="mt-6 rounded-md bg-green-500 px-4 py-2 text-white"
-        >
-          参加
-        </button>
-      </Modal>
-    </div>
+      <HomeClient />
+    </TerminalLayout>
   );
 }
