@@ -20,7 +20,7 @@ export const HomeClient = () => {
         language: "Python",
       },
     });
-  }, []);
+  }, [createRoomAndNavigate]);
 
   const handleDisplayJoinModal = useCallback(() => {
     setShowJoinModal(true);

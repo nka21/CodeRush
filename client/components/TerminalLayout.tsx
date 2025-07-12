@@ -78,6 +78,9 @@ const TerminalFooter = memo((props: TerminalFooterProps) => {
   );
 });
 
+TerminalHeader.displayName = "TerminalHeader";
+TerminalFooter.displayName = "TerminalFooter";
+
 // === TerminalLayout ===
 type TerminalLayoutProps = {
   children: React.ReactNode;
@@ -170,3 +173,5 @@ export const TerminalLayout = memo((props: TerminalLayoutProps) => {
     </div>
   );
 });
+
+TerminalLayout.displayName = "TerminalLayout";

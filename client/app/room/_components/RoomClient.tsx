@@ -148,3 +148,4 @@ export const RoomClient = memo((props: RoomClientProps) => {
 
 PlayerCard.displayName = "PlayerCard";
 EmptySlot.displayName = "EmptySlot";
+RoomClient.displayName = "RoomClient";

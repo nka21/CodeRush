@@ -1,5 +1,4 @@
 import React from "react";
-import type { QuizResult } from "../_types/quiz";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { useState, useEffect } from "react";
@@ -24,8 +23,7 @@ type QuizResultProps = {
 //   {name: 'Player 4', score: 30, rank:4 }
 // ];
 
-export const QuizResultScreen = (props: QuizResultProps) => {
-  const { result } = props;
+export const QuizResultScreen = () => {
   const router = useRouter();
 
   const [players, setPlayers] = useState<
