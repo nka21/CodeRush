@@ -32,12 +32,14 @@ type Room struct {
 // RoomCreationRequest はルーム作成時のリクエストボディ
 type RoomCreationRequest struct {
 	RoomID   string   `json:"roomId"`
+	HostID   string   `json:"hostId"`
 	Settings Settings `json:"settings"`
 }
 
 // JoinRequest はルーム参加時のリクエストボディ
 type JoinRequest struct {
 	PlayerName string `json:"playerName"`
+	UserId     string `json:"userId"`
 }
 
 // ErrorResponse はエラー時の共通レスポンス

@@ -3,11 +3,12 @@
 package handler
 
 import (
-	"net/http"
 	"errors"
+	"net/http"
 
 	"server/src/internal/feature/room/service"
 	"server/src/internal/feature/room/types"
+
 	"github.com/labstack/echo/v4"
 )
 

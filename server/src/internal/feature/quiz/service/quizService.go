@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const TOTAL_QUESTIONS = 10
+const TOTAL_QUESTIONS = 2 // types.Questionの要素数
 
 type QuizService struct {
 	hub        *websocket.RoomHub
@@ -46,6 +46,7 @@ func (s *QuizService) StartGame(roomID string) error {
 		AnsweredUsers:    make(map[string]bool),
 		QuestionNumber:   0,
 		IsQuestionActive: false,
+		UsedQuestionIDs:  make([]string, 0), // 出題済み問題IDを初期化
 	}
 
 	s.gameStates[roomID] = newState
@@ -141,16 +142,30 @@ func (s *QuizService) nextQuestion(roomID string) {
 		return
 	}
 
-	// 10問終わったらゲーム終了
+	// 全問題が終わったらゲーム終了
+	log.Printf("Question check: current=%d, total=%d", state.QuestionNumber, TOTAL_QUESTIONS)
 	if state.QuestionNumber >= TOTAL_QUESTIONS {
+		log.Printf("Game ending: reached maximum questions (%d)", TOTAL_QUESTIONS)
 		s.endGame(roomID)
 		return
 	}
 
 	state.QuestionNumber++
-	state.CurrentQuestion = s.getRandomQuestion()
+	
+	// 重複を避けて問題を選択
+	nextQuestion := s.getNextUniqueQuestion(state.UsedQuestionIDs)
+	if nextQuestion == nil {
+		log.Printf("No more unique questions available, ending game")
+		s.endGame(roomID)
+		return
+	}
+	
+	state.CurrentQuestion = nextQuestion
+	state.UsedQuestionIDs = append(state.UsedQuestionIDs, nextQuestion.ID)
 	state.AnsweredUsers = make(map[string]bool)
 	state.IsQuestionActive = true // 回答受付開始
+
+	log.Printf("Question %d selected: %s (ID: %s)", state.QuestionNumber, nextQuestion.Statement, nextQuestion.ID)
 
 	message := &types.Message{
 		Type: "question_start",
@@ -210,7 +225,35 @@ func (s *QuizService) endGame(roomID string) {
 }
 
 
-// ... (getRandomQuestion, loadDummyQuestions は変更なし)
+// getNextUniqueQuestion は出題済みでない問題を返します。
+func (s *QuizService) getNextUniqueQuestion(usedIDs []string) *types.Question {
+	availableQuestions := make([]*types.Question, 0)
+	
+	for i := range s.questions {
+		question := &s.questions[i]
+		isUsed := false
+		
+		// 出題済みかどうかチェック
+		for _, usedID := range usedIDs {
+			if question.ID == usedID {
+				isUsed = true
+				break
+			}
+		}
+		
+		if !isUsed {
+			availableQuestions = append(availableQuestions, question)
+		}
+	}
+	
+	if len(availableQuestions) == 0 {
+		return nil // 出題可能な問題がない
+	}
+	
+	// 出題可能な問題からランダム選択
+	return availableQuestions[rand.Intn(len(availableQuestions))]
+}
+
 func (s *QuizService) getRandomQuestion() *types.Question {
 	if len(s.questions) == 0 {
 		return nil
@@ -222,13 +265,5 @@ func loadDummyQuestions() []types.Question {
 	return []types.Question{
 		{ID: "q1", Statement: "Go言語で、パッケージ内の非公開な関数や変数を定義する際の命名規則は？", Choices: []string{"先頭を小文字にする", "先頭を大文字にする", "アンダースコアで始める", "予約語を使う"}, Answer: "先頭を小文字にする"},
 		{ID: "q2", Statement: "HTTPステータスコードで、「Not Found」を意味するのは？", Choices: []string{"200", "301", "404", "500"}, Answer: "404"},
-		{ID: "q3", Statement: "gorilla/websocketパッケージの`Upgrader`の役割は？", Choices: []string{"メッセージの暗号化", "HTTP接続のアップグレード", "クライアントの管理", "エラーハンドリング"}, Answer: "HTTP接続のアップグレード"},
-		{ID: "q4", Statement: "JSONのパースに使用するGoの標準パッケージは？", Choices: []string{"encoding/json", "fmt", "strings", "net/http"}, Answer: "encoding/json"},
-		{ID: "q5", Statement: "Goのgoroutineを開始するキーワードは？", Choices: []string{"go", "async", "thread", "run"}, Answer: "go"},
-		{ID: "q6", Statement: "Goのスライスの長さを取得する関数は？", Choices: []string{"len()", "size()", "length()", "count()"}, Answer: "len()"},
-		{ID: "q7", Statement: "Goのマップを初期化する方法は？", Choices: []string{"make(map[string]int)", "new(map[string]int)", "map[string]int{}", "両方A,C"}, Answer: "両方A,C"},
-		{ID: "q8", Statement: "Goのエラーハンドリングで使用する型は？", Choices: []string{"error", "Error", "exception", "Exception"}, Answer: "error"},
-		{ID: "q9", Statement: "Goのチャネルを作成する関数は？", Choices: []string{"make()", "new()", "create()", "channel()"}, Answer: "make()"},
-		{ID: "q10", Statement: "Goの構造体のフィールドを公開するには？", Choices: []string{"先頭を大文字にする", "先頭を小文字にする", "publicキーワード", "exportキーワード"}, Answer: "先頭を大文字にする"},
 	}
 }
