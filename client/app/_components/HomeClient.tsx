@@ -10,17 +10,37 @@ export const HomeClient = () => {
 
   const [showJoinModal, setShowJoinModal] = useState(false);
 
+  // userIdを生成・管理
+  const [userId] = useState(() => {
+    return `user_${Math.random().toString(36).substr(2, 9)}`;
+  });
+
   const handleDisplayMakeModal = useCallback(async () => {
     const roomId = Math.floor(1000 + Math.random() * 9000).toString();
 
-    await createRoomAndNavigate({
-      roomId,
-      settings: {
-        difficulty: "Normal",
-        language: "Python",
-      },
-    });
-  }, [createRoomAndNavigate]);
+    console.log(`ルーム作成: roomId=${roomId}, hostId=${userId}`);
+
+    // userIdをlocalStorageに保存してRoomClientで使用
+    localStorage.setItem("currentUserId", userId);
+    console.log(
+      "localStorageに保存したuserId:",
+      localStorage.getItem("currentUserId"),
+    );
+
+    try {
+      const result = await createRoomAndNavigate({
+        roomId,
+        hostId: userId, // hostIdを追加
+        settings: {
+          difficulty: "Normal",
+          language: "Python",
+        },
+      });
+      console.log("ルーム作成結果:", result);
+    } catch (error) {
+      console.error("ルーム作成エラー:", error);
+    }
+  }, [createRoomAndNavigate, userId]);
 
   const handleDisplayJoinModal = useCallback(() => {
     setShowJoinModal(true);
