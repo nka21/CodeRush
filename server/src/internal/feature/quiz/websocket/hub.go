@@ -115,6 +115,15 @@ func (h *RoomHub) unregisterClient(client *Client) {
 				// DynamoDB から削除
 				if err := h.DBHandler.DeleteRoom(roomID); err != nil {
 					log.Printf("error: failed to delete room from DB: %v", err)
+				for otherClient := range room {
+					if otherClient != client { // 自分自身（ホスト）は除く
+						close(otherClient.Send) // 各クライアントのSendチャネルを閉じると、WritePumpが終了し接続が切れる
+					}
+				}
+				// DBからルームを削除
+				delete(db.Rooms, roomID)
+				if err := h.DBHandler.WriteDB(db); err != nil {
+					log.Printf("error: failed to write DB after deleting room: %v", err)
 				}
 
 				delete(h.rooms, roomID)
