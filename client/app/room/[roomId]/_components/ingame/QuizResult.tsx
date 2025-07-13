@@ -18,12 +18,12 @@ export const QuizResultScreen = (props: QuizResultScreenProps) => {
   // 結果データがない場合のフォールバック
   const displayResult = result || {
     score: 0,
-    totalQuestions: 10,
+    totalQuestions: 100,
     accuracyPercentage: 0,
   };
 
   // 現在はシングルプレイヤーモードとして扱う
-  const playerName = "Player 1";
+  const playerName = ["Player 1", "Player 2"];
   const isWinner = displayResult.accuracyPercentage >= 70; // 70%以上で勝利とする
 
   return (
@@ -36,11 +36,22 @@ export const QuizResultScreen = (props: QuizResultScreenProps) => {
       <div className="font-bold text-green-400">FINAL RESULT</div>
       <pre className="mb-3 rounded bg-black/60 p-4">
         <div className="flex items-center gap-2 py-1 text-green-400">
-          <span>{rankIcons}</span>
-          <span className="flex-1">{playerName}</span>
-          <span className="ml-2">
-            {displayResult.score}/{displayResult.totalQuestions}
-          </span>
+          <div className="flex flex-col gap-4">
+            <div className="text-center">
+              <span>{rankIcons}</span>
+              <span className="flex-1">{playerName[0]}</span>
+              <span className="ml-2">
+                {displayResult.score}/{displayResult.totalQuestions}
+              </span>
+            </div>
+            <div className="text-center">
+              <span>{rankIcons}</span>
+              <span className="flex-1">{playerName[1]}</span>
+              <span className="ml-2">
+                {displayResult.score}/{displayResult.totalQuestions}
+              </span>
+            </div>
+          </div>
         </div>
         <div className="mt-2 text-yellow-400">
           Accuracy: {displayResult.accuracyPercentage}%
