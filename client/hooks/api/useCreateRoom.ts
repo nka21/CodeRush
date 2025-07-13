@@ -12,11 +12,21 @@ export const useCreateRoom = () => {
   const router = useRouter();
 
   const createRoom = useCallback(async (roomData: CreateRoomRequest) => {
+    console.log("CreateRoom APIリクエスト:", roomData);
+
     // リクエストデータのバリデーション
     const validatedBody = CreateRoomRequestSchema.parse(roomData);
+    console.log("バリデーション後のリクエスト:", validatedBody);
 
     // 共通API関数を使用
-    return apiPost<CreateRoomResponse>("/room", validatedBody, RoomSchema);
+    const response = await apiPost<CreateRoomResponse>(
+      "/room",
+      validatedBody,
+      RoomSchema,
+    );
+    console.log("CreateRoom APIレスポンス:", response);
+
+    return response;
   }, []);
 
   const createRoomAndNavigate = useCallback(
