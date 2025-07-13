@@ -49,28 +49,13 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
         ref={scrollRef}
         className="scrollbar-thin scrollbar-thumb-gray-500/50 scrollbar-track-transparent hover:scrollbar-thumb-gray-400/70 max-h-[calc(90vh-510px)] overflow-y-auto rounded-lg border border-[#333] bg-[#1E1E1E]"
       >
-        {isQuestion ? (
-          // 問題文の場合
-          <div className="p-4">
-            {questionNumber && (
-              <div className="mb-3 text-sm text-green-400">
-                Question {questionNumber}
-              </div>
-            )}
-            <div className="text-base leading-relaxed font-medium text-white">
-              {displayContent}
-            </div>
-          </div>
-        ) : (
-          // コードの場合
-          <SyntaxHighlighter
-            language="c"
-            style={vscDarkPlus}
-            className="overflow-x-auto"
-          >
-            {displayContent}
-          </SyntaxHighlighter>
-        )}
+        <SyntaxHighlighter
+          language="c"
+          style={vscDarkPlus}
+          className="overflow-x-auto"
+        >
+          {displayContent}
+        </SyntaxHighlighter>
       </div>
 
       {/* 下部のシャドー：スクロール可能な場合のみ表示 */}
