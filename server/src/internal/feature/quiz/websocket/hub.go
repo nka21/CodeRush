@@ -75,22 +75,21 @@ func (h *RoomHub) registerClient(client *Client) {
 	}()
 }
 
+
 func (h *RoomHub) unregisterClient(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	roomID := client.RoomID
 	userID := client.UserID
 
-	db, err := h.DBHandler.ReadDB()
+	roomData, err := h.DBHandler.ReadDB(roomID)
 	if err != nil {
-		log.Printf("error: failed to read db: %v", err)
+		log.Printf("error: failed to get room from DynamoDB: %v", err)
 		return
 	}
 
-	roomData, roomExists := db.Rooms[roomID]
-
 	var isHost bool = false
-	if roomExists {
+	if roomData != nil {
 		hostPlayer, hostPlayerExists := roomData.Players[roomData.HostID]
 		if hostPlayerExists && hostPlayer.Name == userID {
 			isHost = true
@@ -104,19 +103,18 @@ func (h *RoomHub) unregisterClient(client *Client) {
 			log.Printf("Client %s unregistered from room %s", userID, roomID)
 
 			if isHost {
-				// --- ホストが退出した場合の処理 ---
 				log.Printf("Host %s has left. Closing room %s.", userID, roomID)
 
-				// ルーム解散メッセージを全員に送信
 				closeMsg := &types.Message{
 					Type:    "room_closed",
 					Payload: map[string]string{"message": "ホストが退出したため、ルームは解散されました。"},
 					RoomID:  roomID,
 				}
-
-				// broadcastMessageはロックを取得するため、デッドロックを避けるためゴルーチンで実行
 				go h.broadcastMessage(closeMsg)
 
+				// DynamoDB から削除
+				if err := h.DBHandler.DeleteRoom(roomID); err != nil {
+					log.Printf("error: failed to delete room from DB: %v", err)
 				for otherClient := range room {
 					if otherClient != client { // 自分自身（ホスト）は除く
 						close(otherClient.Send) // 各クライアントのSendチャネルを閉じると、WritePumpが終了し接続が切れる
@@ -128,15 +126,11 @@ func (h *RoomHub) unregisterClient(client *Client) {
 					log.Printf("error: failed to write DB after deleting room: %v", err)
 				}
 
-				// サーバー側のルーム情報を削除
 				delete(h.rooms, roomID)
-
 			} else if len(h.rooms[roomID]) == 0 {
-				// --- 最後のユーザーが退出した場合の処理（ホスト以外） ---
 				delete(h.rooms, roomID)
 				log.Printf("Room %s closed", roomID)
 			} else {
-				// --- 通常のユーザーが退出した場合の処理 ---
 				leaveMsg := &types.Message{
 					Type:    "user_left",
 					Payload: map[string]string{"userId": userID},
@@ -147,6 +141,7 @@ func (h *RoomHub) unregisterClient(client *Client) {
 		}
 	}
 }
+
 
 func (h *RoomHub) broadcastMessage(message *types.Message) {
 	h.mu.RLock()
