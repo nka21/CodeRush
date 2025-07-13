@@ -11,7 +11,6 @@ import { QuestionLog } from "../QuestionLog";
 import { Button } from "@/components/Button";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import type {
-  Question,
   QuizResult,
   AnswerState,
   WebSocketQuestion,
@@ -20,11 +19,10 @@ import type { ClientMessage, ServerMessage } from "@/app/_types/api";
 import { ANIMATION } from "../../_constants/quiz";
 
 type QuizGameClientProps = {
-  // questions: Question[]; // mockデータは不要
   onGameEnd?: () => void;
   roomId?: string;
-  userId?: string; // userIdを追加
-  questionMessage?: any; // 初回の問題メッセージ
+  userId?: string;
+  questionMessage?: ServerMessage;
 };
 
 // ゲーム状態を詳細に管理
@@ -74,7 +72,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
       setAnswerState({ type: "unanswered" });
       setCorrectAnswer(""); // 正解をリセット
     }
-  }, [questionMessage?.payload?.questionNumber]);
+  }, [questionMessage]);
 
   // WebSocket接続を開始
   useEffect(() => {
@@ -119,14 +117,12 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
       case "answer_result":
         const {
           userId: answeredUserId,
-          isCorrect,
           correctAnswer,
           scores,
         } = message.payload;
 
         // 回答者が自分でない場合は、先に回答されたとして処理
-        if (answeredUserId !== userId && !quizResult && userId) {
-          // gamePhaseの代わりにquizResultで判定
+        if (answeredUserId !== userId && !quizResult && userId) { // gamePhaseの代わりにquizResultで判定
           // 正解の選択肢インデックスを見つける
           const correctIndex =
             currentQuestion?.choices.findIndex(
@@ -202,7 +198,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         }
         break;
     }
-  }, [lastMessage, userId, handleQuizComplete, quizResult, currentQuestion]); // gamePhaseを依存配列から削除
+  }, [lastMessage, userId, handleQuizComplete, quizResult, currentQuestion, currentQuestionIndex, score]);
 
   // QuestionLogに移行する関数
   const handleShowQuestionLog = useCallback(() => {

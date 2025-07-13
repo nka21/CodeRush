@@ -3,9 +3,9 @@
 import { TerminalLayout } from "@/components/TerminalLayout";
 import { Button } from "@/components/Button";
 import { memo, useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { QuizGameClient } from "../[roomId]/_components/ingame/QuizGameClient";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import type { ServerMessage } from "@/app/_types/api";
 
 type Player = {
   id: string;
@@ -17,6 +17,11 @@ type GameState = "lobby" | "ingame";
 
 type RoomClientProps = {
   roomId: string;
+};
+
+type RoomData = {
+  players: Record<string, { name: string }>;
+  hostId: string;
 };
 
 /**
@@ -68,20 +73,16 @@ export const RoomClient = memo((props: RoomClientProps) => {
   const [isStartingGame, setIsStartingGame] = useState(false); // ゲーム開始中フラグ
 
   // 最後に受信したquestion_startメッセージを保持
-  const [lastQuestionMessage, setLastQuestionMessage] = useState<any>(null);
+  const [lastQuestionMessage, setLastQuestionMessage] = useState<
+    ServerMessage | undefined
+  >(undefined);
 
   // userIdを生成・管理（クライアントサイドでのみ実行）
   const [userId, setUserId] = useState<string>("");
 
   // WebSocket接続
-  const {
-    isConnected,
-    sendMessage,
-    lastMessage,
-    connect,
-    disconnect,
-    connectionStatus,
-  } = useWebSocket();
+  const { isConnected, lastMessage, connect, connectionStatus } =
+    useWebSocket();
 
   // ルーム情報を取得する関数
   const fetchRoomInfo = useCallback(async () => {
@@ -89,11 +90,11 @@ export const RoomClient = memo((props: RoomClientProps) => {
       const response = await fetch(`http://localhost:8080/api/room/${roomId}`);
 
       if (response.ok) {
-        const roomData = await response.json();
+        const roomData: RoomData = await response.json();
 
         // プレイヤーリストを変換
         const playersList = Object.entries(roomData.players || {}).map(
-          ([id, player]: [string, any]) => ({
+          ([id, player]) => ({
             id,
             name: player.name,
             isHost: id === roomData.hostId,
@@ -118,12 +119,10 @@ export const RoomClient = memo((props: RoomClientProps) => {
     } catch (error) {
       console.error("ルーム情報取得エラー:", error);
     }
-  }, [roomId, userId, hasJoined]);
+  }, [roomId, userId]);
 
-  const router = useRouter();
-
-  // ゲーム開始ハンドラー
-  const handleStartGame = useCallback(async () => {
+  // ゲーム開始処理
+  const handleGameStart = useCallback(async () => {
     if (isStartingGame) return;
 
     setIsStartingGame(true);
@@ -142,7 +141,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
       );
 
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
       } else {
         console.error("ゲーム開始API失敗:", response.status);
       }
@@ -200,10 +199,12 @@ export const RoomClient = memo((props: RoomClientProps) => {
           case "question_start":
             setGameState("ingame");
             // 新しい問題のみを保持（同じ問題番号の問題は更新しない）
-            setLastQuestionMessage((prev: any) => {
+            setLastQuestionMessage((prev) => {
               if (
-                prev?.payload?.questionNumber ===
-                lastMessage.payload.questionNumber
+                prev?.type === "question_start" &&
+                lastMessage.type === "question_start" &&
+                prev.payload.questionNumber ===
+                  lastMessage.payload.questionNumber
               ) {
                 return prev;
               }
@@ -250,7 +251,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
         );
 
         if (response.ok) {
-          const result = await response.json();
+          await response.json();
           setHasJoined(true);
           fetchRoomInfo();
         } else {
@@ -262,7 +263,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
     };
 
     joinRoom();
-  }, [isLoading, players, userId, roomId, hasJoined, hostId]);
+  }, [isLoading, players, userId, roomId, hasJoined, fetchRoomInfo]);
 
   // userIdが初期化されるまで待機
   if (!userId) {
@@ -396,7 +397,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
           <Button
             label={isStartingGame ? "STARTING..." : "START_GAME"}
             description="// ゲームを開始する"
-            onClick={isStartingGame ? () => {} : handleStartGame}
+            onClick={isStartingGame ? () => {} : handleGameStart}
             shortcutKey={2}
           />
         )}
