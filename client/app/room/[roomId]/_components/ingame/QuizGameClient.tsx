@@ -28,7 +28,7 @@ type QuizGameClientProps = {
 };
 
 // ゲーム状態を詳細に管理
-type GamePhase = "playing" | "result" | "question_log";
+type GamePhase = "result" | "question_log";
 
 export const QuizGameClient = (props: QuizGameClientProps) => {
   const { onGameEnd, roomId, userId, questionMessage } = props;
@@ -40,7 +40,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
-  const [gamePhase, setGamePhase] = useState<GamePhase>("playing");
+  const [gamePhase, setGamePhase] = useState<GamePhase | null>(null); // nullはplaying状態を表す
 
   // WebSocketから受信した現在の問題
   const [currentQuestion, setCurrentQuestion] =
@@ -64,13 +64,11 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   // 初期化時にRoomClientから渡された問題メッセージを処理
   useEffect(() => {
     if (questionMessage && questionMessage.type === "question_start") {
-      console.log("🎬 初期問題メッセージを処理:", questionMessage.payload);
       const questionData: WebSocketQuestion = {
         questionNumber: questionMessage.payload.questionNumber,
         question: questionMessage.payload.question,
         choices: questionMessage.payload.choices,
       };
-      console.log("📋 初期問題データを設定:", questionData);
       setCurrentQuestion(questionData);
       setCurrentQuestionIndex(questionMessage.payload.questionNumber - 1);
       setAnswerState({ type: "unanswered" });
@@ -88,38 +86,29 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     };
   }, [roomId, userId, connect, disconnect]);
 
-  const handleQuizComplete = useCallback(
-    (result: QuizResult) => {
-      console.log("🎯 handleQuizComplete実行:", result);
-      console.log("📈 現在のgamePhase:", gamePhase);
-      setQuizResult(result);
-      setGamePhase("result");
-      console.log("✅ gamePhaseを'result'に変更完了");
-    },
-    [gamePhase],
-  );
+  const handleQuizComplete = useCallback((result: QuizResult) => {
+    setQuizResult(result);
+    setGamePhase("result");
+  }, []);
 
   // サーバーからのメッセージを処理
   useEffect(() => {
     if (!lastMessage) return;
 
-    console.log("🎮 QuizGameClient - メッセージ受信:", lastMessage);
     const message = lastMessage as ServerMessage;
 
     switch (message.type) {
       case "user_joined":
-        console.log("👤 User joined:", message.payload.userId);
         break;
       case "question_start":
-        console.log("❓ Question started:", message.payload);
-        // サーバーから次の問題が送られてきた場合の遷移処理
-        if (gamePhase === "playing") {
+        // gamePhaseチェックを削除（currentQuestionの有無で判定）
+        if (!quizResult) {
+          // ゲーム終了後でなければ処理
           const questionData: WebSocketQuestion = {
             questionNumber: message.payload.questionNumber,
             question: message.payload.question,
             choices: message.payload.choices,
           };
-          console.log("📋 問題データを設定:", questionData);
           setCurrentQuestion(questionData);
           setCurrentQuestionIndex(message.payload.questionNumber - 1);
           setAnswerState({ type: "unanswered" });
@@ -128,7 +117,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         }
         break;
       case "answer_result":
-        console.log("✅ Answer result:", message.payload);
         const {
           userId: answeredUserId,
           isCorrect,
@@ -137,8 +125,8 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         } = message.payload;
 
         // 回答者が自分でない場合は、先に回答されたとして処理
-        if (answeredUserId !== userId && gamePhase === "playing" && userId) {
-          console.log("🏃 他の人が先に回答:", answeredUserId);
+        if (answeredUserId !== userId && !quizResult && userId) {
+          // gamePhaseの代わりにquizResultで判定
           // 正解の選択肢インデックスを見つける
           const correctIndex =
             currentQuestion?.choices.findIndex(
@@ -159,29 +147,12 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
         // スコアを更新（全員のスコアがサーバーから送られてくる）
         if (scores && userId && typeof scores[userId] === "number") {
-          console.log(`💯 スコア更新: ${score} → ${scores[userId]}`);
           setScore(scores[userId]);
-        } else {
-          console.log("⚠️ スコア更新失敗:", {
-            scores,
-            userId,
-            userScore: userId ? scores?.[userId] : undefined,
-          });
         }
         break;
       case "game_over":
-        console.log("🏁 Game over:", message.payload);
-        console.log("🔍 game_over詳細分析:", {
-          messageType: message.type,
-          payload: message.payload,
-          userId: userId,
-          gamePhase: gamePhase,
-          currentQuestionIndex: currentQuestionIndex,
-        });
-
         // 実際の問題数を設定（最後の問題番号から推定）
         const actualTotalQuestions = currentQuestionIndex + 1;
-        console.log("📊 実際の問題数:", actualTotalQuestions);
         setTotalQuestions(actualTotalQuestions);
 
         // サーバーから送られてくる最終結果データを使用
@@ -192,14 +163,9 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
             { name: string; score: number; rank: number }
           >;
         };
-        console.log("📊 gameOverData構造:", gameOverData);
 
         // playersが存在するかチェック
         if (!gameOverData.players) {
-          console.error(
-            "❌ gameOverDataにplayersが存在しません:",
-            gameOverData,
-          );
           // フォールバック：現在のスコアを使用
           const result: QuizResult = {
             score,
@@ -208,16 +174,11 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
               (score / (actualTotalQuestions * 10)) * 100,
             ),
           };
-          console.log(
-            "🏆 結果画面データ（フォールバック - playersなし）:",
-            result,
-          );
           handleQuizComplete(result);
           break;
         }
 
         const myResult = gameOverData.players[userId || ""];
-        console.log("👤 自分の結果:", { userId, myResult });
 
         if (myResult) {
           const result: QuizResult = {
@@ -227,10 +188,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
               (myResult.score / (actualTotalQuestions * 10)) * 100,
             ), // 10点/問題
           };
-          console.log("🏆 結果画面データ:", result);
-          console.log("🎬 handleQuizComplete呼び出し前");
           handleQuizComplete(result);
-          console.log("🎬 handleQuizComplete呼び出し後");
         } else {
           // フォールバック：現在のスコアを使用
           const result: QuizResult = {
@@ -240,22 +198,11 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
               (score / (actualTotalQuestions * 10)) * 100,
             ),
           };
-          console.log("🏆 結果画面データ（フォールバック）:", result);
-          console.log("🎬 handleQuizComplete呼び出し前（フォールバック）");
           handleQuizComplete(result);
-          console.log("🎬 handleQuizComplete呼び出し後（フォールバック）");
         }
         break;
     }
-  }, [
-    lastMessage?.type,
-    lastMessage?.type === "question_start"
-      ? (lastMessage as any)?.payload?.questionNumber
-      : null,
-    gamePhase,
-    userId,
-    handleQuizComplete,
-  ]);
+  }, [lastMessage, userId, handleQuizComplete, quizResult, currentQuestion]); // gamePhaseを依存配列から削除
 
   // QuestionLogに移行する関数
   const handleShowQuestionLog = useCallback(() => {
@@ -276,8 +223,8 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   // );
 
   const moveToNextQuestion = useCallback(() => {
-    // ゲーム終了状態の場合は何もしない
-    if (gamePhase !== "playing") {
+    // quizResultがあれば何もしない
+    if (quizResult) {
       return;
     }
 
@@ -286,9 +233,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     // 通常はサーバーからgame_overメッセージが来るので、ここではゲーム完了処理をしない
     // 万が一の場合のフォールバック
     if (totalQuestions !== 999 && nextIndex >= totalQuestions) {
-      console.log(
-        "⚠️ クライアント側でゲーム完了を検出（通常はサーバーから通知される）",
-      );
       const result: QuizResult = {
         score,
         totalQuestions: totalQuestions,
@@ -304,19 +248,12 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     totalQuestions,
     score,
     handleQuizComplete,
-    gamePhase,
+    quizResult, // gamePhaseをquizResultに変更
   ]);
 
   const submitAnswer = useCallback(
     (selectedIndex: number) => {
-      if (hasAnswered || !currentQuestion || gamePhase !== "playing") return;
-
-      console.log("🎯 回答を送信:", {
-        selectedIndex,
-        selectedChoice: currentQuestion.choices[selectedIndex],
-        allChoices: currentQuestion.choices,
-        questionNumber: currentQuestion.questionNumber,
-      });
+      if (hasAnswered || !currentQuestion || quizResult) return; // gamePhaseをquizResultに変更
 
       setAnswerState({ type: "answered", selectedIndex });
 
@@ -328,25 +265,24 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
             answer: currentQuestion.choices[selectedIndex],
           },
         };
-        console.log("📤 WebSocketメッセージ送信:", message);
         sendMessage(message);
       }
 
       // サーバーからの応答を待つため、ローカルでのスコア更新や自動遷移は行わない
       // answer_resultメッセージでスコアとゲーム状態が更新される
     },
-    [hasAnswered, currentQuestion, gamePhase, isConnected, sendMessage],
+    [hasAnswered, currentQuestion, quizResult, isConnected, sendMessage], // gamePhaseをquizResultに変更
   );
 
   const handleTimeExpired = useCallback(() => {
-    if (hasAnswered || gamePhase !== "playing") return;
+    if (hasAnswered || quizResult) return; // gamePhaseをquizResultに変更
 
     setAnswerState({ type: "time_expired" });
 
     setTimeout(() => {
       moveToNextQuestion();
     }, ANIMATION.ANSWER_REVEAL_DELAY_MS);
-  }, [hasAnswered, moveToNextQuestion, gamePhase]);
+  }, [hasAnswered, moveToNextQuestion, quizResult]); // gamePhaseをquizResultに変更
 
   const getAnswerChoiceStatus = useCallback(
     (choiceIndex: number) => {
@@ -383,25 +319,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     setIsTypingComplete(false);
   }, [currentQuestionIndex]);
 
-  // デバッグ用：currentQuestionの状態をログ出力
-  useEffect(() => {
-    console.log("🎯 現在の問題状態:", {
-      currentQuestion,
-      currentQuestionIndex,
-      gamePhase,
-      hasCurrentQuestion: !!currentQuestion,
-    });
-  }, [currentQuestion, currentQuestionIndex, gamePhase]);
-
-  // デバッグ用：gamePhaseとquizResultの状態を監視
-  useEffect(() => {
-    console.log("🎮 ゲーム状態変更:", {
-      gamePhase,
-      quizResult,
-      hasQuizResult: !!quizResult,
-    });
-  }, [gamePhase, quizResult]);
-
   const commandText = `--question ${currentQuestionIndex + 1}`;
 
   // キーボードショートカット
@@ -433,7 +350,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
   // 結果画面
   if (gamePhase === "result" && quizResult) {
-    console.log("🎊 結果画面をレンダリング:", { gamePhase, quizResult });
     return (
       <TerminalLayout cli="--complete" onTypingComplete={() => {}}>
         <QuizResultScreen
@@ -447,7 +363,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
   // QuestionLog画面
   if (gamePhase === "question_log") {
-    console.log("📋 QuestionLog画面をレンダリング");
     return (
       <TerminalLayout cli="--question.log" onTypingComplete={() => {}}>
         <div className="max-h-[60vh] space-y-4 overflow-y-auto">
@@ -472,10 +387,6 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   }
 
   // クイズプレイ画面
-  console.log("🎮 クイズプレイ画面をレンダリング:", {
-    gamePhase,
-    currentQuestion: !!currentQuestion,
-  });
   return (
     <TerminalLayout cli={commandText} onTypingComplete={handleTypingComplete}>
       <QuizTimerSection

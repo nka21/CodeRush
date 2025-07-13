@@ -86,13 +86,10 @@ export const RoomClient = memo((props: RoomClientProps) => {
   // ルーム情報を取得する関数
   const fetchRoomInfo = useCallback(async () => {
     try {
-      console.log(`ルーム情報を取得中: roomId=${roomId}`);
-
       const response = await fetch(`http://localhost:8080/api/room/${roomId}`);
 
       if (response.ok) {
         const roomData = await response.json();
-        console.log("ルーム情報取得成功:", roomData);
 
         // プレイヤーリストを変換
         const playersList = Object.entries(roomData.players || {}).map(
@@ -103,13 +100,6 @@ export const RoomClient = memo((props: RoomClientProps) => {
           }),
         );
 
-        console.log("プレイヤー数詳細:", {
-          playersCount: playersList.length,
-          maxPlayers: 4,
-          playersList,
-          roomData: roomData.players,
-        });
-
         setPlayers(playersList);
         setHostId(roomData.hostId);
         setIsLoading(false);
@@ -119,17 +109,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
           (player) => player.id === userId,
         );
 
-        console.log("📊 fetchRoomInfo - 参加済みチェック:", {
-          userId,
-          hostId: roomData.hostId,
-          isCurrentUserInRoom,
-          currentHasJoined: hasJoined,
-          willSetHasJoined: isCurrentUserInRoom,
-          players: playersList.map((p) => ({ id: p.id, name: p.name })),
-        });
-
         if (isCurrentUserInRoom) {
-          console.log("✅ fetchRoomInfo: hasJoinedをtrueに設定");
           setHasJoined(true);
         }
       } else {
@@ -148,7 +128,6 @@ export const RoomClient = memo((props: RoomClientProps) => {
 
     setIsStartingGame(true);
     try {
-      console.log(`ゲーム開始APIを呼び出し中: roomId=${roomId}`);
       const response = await fetch(
         `http://localhost:8080/api/quiz/start/${roomId}`,
         {
@@ -164,7 +143,6 @@ export const RoomClient = memo((props: RoomClientProps) => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("ゲーム開始API成功:", result);
       } else {
         console.error("ゲーム開始API失敗:", response.status);
       }
@@ -185,11 +163,9 @@ export const RoomClient = memo((props: RoomClientProps) => {
     if (typeof window !== "undefined") {
       const storedUserId = localStorage.getItem("currentUserId");
       if (storedUserId) {
-        console.log("🔑 保存済みuserIdを使用:", storedUserId);
         setUserId(storedUserId);
       } else {
         const newUserId = `user_${Math.random().toString(36).substr(2, 9)}`;
-        console.log("🆕 新しいuserIdを生成:", newUserId);
         localStorage.setItem("currentUserId", newUserId);
         setUserId(newUserId);
       }
@@ -207,26 +183,21 @@ export const RoomClient = memo((props: RoomClientProps) => {
   useEffect(() => {
     if (userId && roomId) {
       connect(roomId, userId);
-      console.log(`WebSocket接続開始: roomId=${roomId}, userId=${userId}`);
     }
   }, [connect, roomId, userId]);
 
   // WebSocketメッセージの処理
   useEffect(() => {
     if (lastMessage) {
-      console.log("受信メッセージ:", lastMessage);
-
       // ゲーム状態に応じてメッセージ処理を分岐
       if (gameState === "lobby") {
         // ロビー状態でのみ処理
         switch (lastMessage.type) {
           case "user_joined":
-            console.log("ユーザー参加:", lastMessage.payload);
             // ユーザーリストを更新
             fetchRoomInfo();
             break;
           case "question_start":
-            console.log("ゲーム開始:", lastMessage.payload);
             setGameState("ingame");
             // 新しい問題のみを保持（同じ問題番号の問題は更新しない）
             setLastQuestionMessage((prev: any) => {
@@ -239,78 +210,31 @@ export const RoomClient = memo((props: RoomClientProps) => {
               return lastMessage;
             });
             break;
-          default:
-            console.log(
-              "ロビー状態で未知のメッセージタイプ:",
-              lastMessage.type,
-            );
-        }
-      } else if (gameState === "ingame") {
-        // ゲーム中は特定のメッセージのみ処理
-        switch (lastMessage.type) {
-          case "game_over":
-            console.log("ゲーム終了:", lastMessage.payload);
-            setGameState("lobby");
-            break;
-          // 他のメッセージはQuizGameClientに処理を委ねる
-          default:
-            console.log(
-              "ゲーム中メッセージ（QuizGameClientで処理）:",
-              lastMessage.type,
-            );
         }
       }
     }
   }, [lastMessage, gameState, fetchRoomInfo]);
 
-  // 接続完了後のログ出力
-  useEffect(() => {
-    if (isConnected && roomId && userId) {
-      console.log("ルームでWebSocket接続完了:", { roomId, userId });
-    }
-  }, [isConnected, roomId, userId]);
-
   // 自動参加チェック
   useEffect(() => {
-    console.log("=== 参加チェック開始 ===");
-    console.log("参加チェック:", {
-      isLoading,
-      playersLength: players.length,
-      hasJoined,
-      userId,
-      hostId,
-    });
-
     if (isLoading) {
-      console.log("参加チェックをスキップ: まだローディング中");
-      console.log("=== 参加チェック終了 ===");
       return;
     }
 
     if (players.length === 0) {
-      console.log("参加チェックをスキップ: プレイヤーリストが空");
-      console.log("=== 参加チェック終了 ===");
       return;
     }
 
     if (hasJoined) {
-      console.log("参加チェックをスキップ:", { reason: "Already joined" });
-      console.log("=== 参加チェック終了 ===");
       return;
     }
 
     if (!userId) {
-      console.log("参加チェックをスキップ: userIdが未設定");
-      console.log("=== 参加チェック終了 ===");
       return;
     }
 
-    console.log("🔄 自動参加を実行");
-
     const joinRoom = async () => {
       try {
-        console.log(`ルーム参加中: roomId=${roomId}, userId=${userId}`);
-
         const response = await fetch(
           `http://localhost:8080/api/room/${roomId}/join`,
           {
@@ -327,7 +251,6 @@ export const RoomClient = memo((props: RoomClientProps) => {
 
         if (response.ok) {
           const result = await response.json();
-          console.log("ルーム参加成功:", result);
           setHasJoined(true);
           fetchRoomInfo();
         } else {
@@ -339,14 +262,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
     };
 
     joinRoom();
-    console.log("=== 参加チェック終了 ===");
   }, [isLoading, players, userId, roomId, hasJoined, hostId]);
-
-  console.log("🏠 RoomClient初期化:", {
-    roomId,
-    userId,
-    timestamp: new Date().toLocaleTimeString(),
-  });
 
   // userIdが初期化されるまで待機
   if (!userId) {
@@ -372,35 +288,9 @@ export const RoomClient = memo((props: RoomClientProps) => {
   // 現在のユーザーがホストかどうかを判定
   const isHost = userId === hostId;
 
-  console.log("🎯 ホスト判定詳細:", {
-    userId,
-    hostId,
-    isHost,
-    comparison: `"${userId}" === "${hostId}"`,
-    userIdType: typeof userId,
-    hostIdType: typeof hostId,
-    userIdLength: userId?.length || 0,
-    hostIdLength: hostId?.length || 0,
-    playersCount: players.length,
-    playersData: players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      isHost: p.isHost,
-    })),
-  });
-
   // プレイヤー数に応じて最大値を設定（最低4人、実際のプレイヤー数まで対応）
   const maxPlayers = Math.max(4, players.length);
   const emptySlots = maxPlayers - players.length;
-
-  console.log("プレイヤー数計算:", {
-    playersLength: players.length,
-    maxPlayers,
-    emptySlots,
-    isHost,
-    userId,
-    hostId,
-  });
 
   // ロード中の表示
   if (isLoading) {
