@@ -3,7 +3,6 @@ package main
 
 import (
 	"log"
-	"server/src/config"
 	"server/src/internal/database"
 	"server/src/internal/feature/quiz"
 	"server/src/internal/feature/quiz/service" // serviceをインポート
@@ -15,9 +14,8 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
 
-	db, err := database.NewDBHandler(cfg.DBPath)
+	db, err := database.NewDBConnection()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}

@@ -5,27 +5,29 @@ package types
 import "time"
 
 // Settings はゲームルームの設定
+
 type Settings struct {
-	Difficulty string `json:"difficulty"`
-	Language   string `json:"language"`
+	Difficulty string `json:"difficulty" dynamodbav:"difficulty"`
+	Language   string `json:"language" dynamodbav:"language"`
 }
 
-// Player はゲーム参加者
 type Player struct {
-	Name    string `json:"name"`
-	Score   int    `json:"score"`
-	IsReady bool   `json:"isReady"`
+	Name    string `json:"name" dynamodbav:"name"`
+	Score   int    `json:"score" dynamodbav:"score"`
+	IsReady bool   `json:"isReady" dynamodbav:"is_ready"`
 }
+
 
 // Room は個々のゲームルームの全情報
 type Room struct {
-	RoomID    string            `json:"roomId"`
-	HostID    string            `json:"hostId"`
-	Settings  Settings          `json:"settings"`
-	Players   map[string]Player `json:"players"`
-	GameState string            `json:"gameState"`
-	CreatedAt time.Time         `json:"createdAt"`
+	RoomID    string            `json:"roomId" dynamodbav:"room_id"`
+	HostID    string            `json:"hostId" dynamodbav:"host_id"`
+	Settings  Settings          `json:"settings" dynamodbav:"settings"`
+	Players   map[string]Player `json:"players" dynamodbav:"players"`
+	GameState string            `json:"gameState" dynamodbav:"game_state"`
+	CreatedAt time.Time         `json:"createdAt" dynamodbav:"created_at"`
 }
+
 
 // --- リクエスト/レスポンス用の構造体 ---
 

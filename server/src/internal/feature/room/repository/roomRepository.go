@@ -1,85 +1,56 @@
-// backend/src/internal/feature/quiz/repository/repository.go
-// データ永続化層の実装
+
 package repository
 
 import (
 	"errors"
-	"server/src/internal/feature/room/utils"
 	"server/src/internal/database"
 	"server/src/internal/feature/room/types"
+	"server/src/internal/feature/room/utils"
 )
 
-// QuizRepository はルームデータへのアクセスを担当します。
 type RoomRepository struct {
 	db *database.DBHandler
 }
 
-// NewQuizRepository は新しいリポジトリインスタンスを生成します。
 func NewRoomRepository(db *database.DBHandler) *RoomRepository {
 	return &RoomRepository{db: db}
 }
 
-// CreateRoom は新しいルームをDBに保存します。
+// CreateRoom は新しいルームを作成（すでに存在する場合はエラー）
 func (r *RoomRepository) CreateRoom(room *types.Room) (*types.Room, error) {
-	db, err := r.db.ReadDB()
-	if err != nil {
-		return nil, err
-	}
-
-	if _, exists := db.Rooms[room.RoomID]; exists {
+	existing, err := r.db.ReadDB(room.RoomID)
+	if err == nil && existing != nil {
 		return nil, errors.New("room ID already exists")
 	}
 
-	db.Rooms[room.RoomID] = *room
-
-	if err := r.db.WriteDB(db); err != nil {
+	err = r.db.WriteDB(room)
+	if err != nil {
 		return nil, err
 	}
 	return room, nil
 }
 
-// FindRoomByID はIDでルームを検索します。
+// FindRoomByID は DynamoDB からルームを取得
 func (r *RoomRepository) FindRoomByID(id string) (*types.Room, error) {
-	db, err := r.db.ReadDB()
+	room, err := r.db.ReadDB(id)
 	if err != nil {
-		return nil, err
-	}
-
-	room, exists := db.Rooms[id]
-	if !exists{
 		return nil, utils.ErrRoomNotFound
 	}
-	return &room, nil
+	return room, nil
 }
 
-// DeleteRoom はIDでルームを削除します。
+// DeleteRoom は DynamoDB からルームを削除
 func (r *RoomRepository) DeleteRoom(id string) error {
-	db, err := r.db.ReadDB()
-	if err != nil {
-		return err
-	}
-
-	if _, exists := db.Rooms[id]; !exists {
-		return errors.New("room not found")
-	}
-
-	delete(db.Rooms, id)
-	return r.db.WriteDB(db)
+	return r.db.DeleteRoom(id)
 }
 
-// UpdateRoom は既存のルーム情報を更新します。
+// UpdateRoom は DynamoDB にルーム情報を上書き
 func (r *RoomRepository) UpdateRoom(room *types.Room) (*types.Room, error) {
-	db, err := r.db.ReadDB()
-	if err != nil {
-		return nil, err
-	}
-
-	if _, exists := db.Rooms[room.RoomID]; !exists {
+	returned, err := r.db.ReadDB(room.RoomID)
+	if err != nil || returned == nil {
 		return nil, errors.New("room not found")
 	}
-
-	db.Rooms[room.RoomID] = *room
-	if err := r.db.WriteDB(db); err != nil {
+	if err := r.db.WriteDB(room); err != nil {
 		return nil, err
 	}
 	return room, nil
