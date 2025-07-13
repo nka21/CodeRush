@@ -1,77 +1,92 @@
-// backend/src/internal/database/database.go
-// データベース（JSONファイル）へのアクセスロジック
+// backend/src/internal/database/dynamodb.go
 package database
 
 import (
-	"server/src/config"
-
-
-	"encoding/json"
+	"context"
+	"fmt"
 	"os"
-	"sync"
-	"server/src/internal/feature/room/types"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	roomtypes "server/src/internal/feature/room/types"
 )
 
-// DBHandler はJSONファイルへの読み書きを安全に行うためのハンドラです。
 type DBHandler struct {
-	filePath string
-	mu       sync.RWMutex // ファイルへの同時アクセスを制御するためのMutex
-}
-
-// RoomsDB はJSONファイルのトップレベル構造に対応します。
-type RoomsDB struct {
-	Rooms map[string]types.Room `json:"rooms"`
-}
-
-// NewDBHandler は新しいDBHandlerを初期化します。
-func NewDBHandler(filePath string) (*DBHandler, error) {
-	// ファイルが存在しない場合は、空のDBを作成する
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		initialDB := &RoomsDB{Rooms: make(map[string]types.Room)}
-		data, _ := json.MarshalIndent(initialDB, "", "  ")
-		if err := os.WriteFile(filePath, data, 0644); err != nil {
-			return nil, err
-		}
-	}
-	return &DBHandler{filePath: filePath}, nil
+	client    *dynamodb.Client
+	tableName string
 }
 
 func NewDBConnection() (*DBHandler, error) {
-	cfg := config.Load()
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return nil, fmt.Errorf("unable to load AWS config: %w", err)
+	}
 
-	db, err := NewDBHandler(cfg.DBPath)
+	client := dynamodb.NewFromConfig(cfg)
+
+	tableName := os.Getenv("DYNAMO_TABLE")
+
+	if tableName == "" {
+		tableName = "quiz" // デフォルト名
+	}
+
+	tableName = "quiz"
+
+	return &DBHandler{
+		client:    client,
+		tableName: tableName,
+	}, nil
+}
+
+
+// ルームを1件取得
+func (h *DBHandler) ReadDB(id string) (*roomtypes.Room, error) {
+	resp, err := h.client.GetItem(context.TODO(), &dynamodb.GetItemInput{
+		TableName: aws.String(h.tableName),
+		Key: map[string]types.AttributeValue{
+			"room_id": &types.AttributeValueMemberS{Value: id},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if resp.Item == nil {
+		return nil, fmt.Errorf("room not found")
+	}
+
+	var room roomtypes.Room
+	err = attributevalue.UnmarshalMap(resp.Item, &room)
 	if err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return &room, nil
 }
 
-// ReadDB はJSONファイルから全データを読み込みます。
-func (h *DBHandler) ReadDB() (*RoomsDB, error) {
-	h.mu.RLock() // 読み込みロック
-	defer h.mu.RUnlock()
-
-	data, err := os.ReadFile(h.filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	var db RoomsDB
-	if err := json.Unmarshal(data, &db); err != nil {
-		return nil, err
-	}
-	return &db, nil
-}
-
-// WriteDB は指定されたデータをJSONファイルに書き込みます。
-func (h *DBHandler) WriteDB(db *RoomsDB) error {
-	h.mu.Lock() // 書き込みロック
-	defer h.mu.Unlock()
-
-	data, err := json.MarshalIndent(db, "", "  ")
+// ルームを保存（Put）
+func (h *DBHandler) WriteDB(room *roomtypes.Room) error {
+	item, err := attributevalue.MarshalMap(room)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(h.filePath, data, 0644)
+
+	_, err = h.client.PutItem(context.TODO(), &dynamodb.PutItemInput{
+		TableName: aws.String(h.tableName),
+		Item:      item,
+	})
+	return err
+}
+
+
+func (h *DBHandler) DeleteRoom(roomID string) error {
+	_, err := h.client.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
+		TableName: aws.String(h.tableName),
+		Key: map[string]types.AttributeValue{
+			"room_id": &types.AttributeValueMemberS{Value: roomID},
+		},
+	})
+	return err
 }

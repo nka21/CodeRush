@@ -11,10 +11,10 @@ type Message struct {
 
 // Question は1つのクイズ問題を表す構造体です。
 type Question struct {
-	ID        string   `json:"id"`
-	Statement string   `json:"statement"` // 問題文
-	Choices   []string `json:"choices"`   // 選択肢
-	Answer    string   `json:"-"`         // 答え（クライアントには送信しない）
+	ID        string   `json:"Id"`
+	Statement string   `json:"Statement"` // 問題文
+	Choices   []string `json:"Choices"`   // 選択肢
+	Answer    string   `json:"Answer"`    // 答え
 }
 
 // GameState は一つのルームにおける現在のゲーム状態を保持します。

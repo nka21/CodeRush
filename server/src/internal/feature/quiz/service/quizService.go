@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"os"
 	"server/src/internal/feature/quiz/types"
 	"server/src/internal/feature/quiz/websocket"
 	"sort"
@@ -22,7 +23,10 @@ type QuizService struct {
 }
 
 func NewQuizService(hub *websocket.RoomHub) *QuizService {
-	questions := loadDummyQuestions()
+	questions, err := loadQuestions("../mock/mock.json")
+	if err != nil {
+		log.Fatalf("error: cannot load questions: %v", err)
+	}
 	return &QuizService{
 		hub:        hub,
 		questions:  questions,
@@ -261,9 +265,16 @@ func (s *QuizService) getRandomQuestion() *types.Question {
 	return &s.questions[rand.Intn(len(s.questions))]
 }
 
-func loadDummyQuestions() []types.Question {
-	return []types.Question{
-		{ID: "q1", Statement: "Go言語で、パッケージ内の非公開な関数や変数を定義する際の命名規則は？", Choices: []string{"先頭を小文字にする", "先頭を大文字にする", "アンダースコアで始める", "予約語を使う"}, Answer: "先頭を小文字にする"},
-		{ID: "q2", Statement: "HTTPステータスコードで、「Not Found」を意味するのは？", Choices: []string{"200", "301", "404", "500"}, Answer: "404"},
+func loadQuestions(filePath string) ([]types.Question, error) {
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
 	}
+
+	var questions []types.Question
+	if err := json.Unmarshal(file, &questions); err != nil {
+		return nil, err
+	}
+
+	return questions, nil
 }
