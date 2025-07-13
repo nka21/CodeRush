@@ -1,0 +1,62 @@
+[
+  {
+    "ID": "q1",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Piscine42\";\n    printf(\"%c\\n\", *(str + 4));\n    return 0;\n}",
+    "Choices": ["P", "i", "n", "e"],
+    "Answer": "n"
+  },
+  {
+    "ID": "q2",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    char *s = \"hello\";\n    s[0] = 'H';\n    printf(\"%s\\n\", s);\n    return 0;\n}",
+    "Choices": ["Hello", "hello", "Segmentation fault", "Compilation error"],
+    "Answer": "Segmentation fault"
+  },
+  {
+    "ID": "q3",
+    "Statement": "#include <stdio.h>\n\nvoid f() {\n    static int n = 0;\n    n++;\n    printf(\"%d \", n);\n}\n\nint main() {\n    f(); f(); f();\n    return 0;\n}",
+    "Choices": ["1 1 1", "1 2 3", "0 1 2", "3 3 3"],
+    "Answer": "1 2 3"
+  },
+  {
+    "ID": "q4",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    int arr[5] = {1, 2, 3, 4, 5};\n    int *p = arr;\n    printf(\"%d\\n\", *(p + 2));\n    return 0;\n}",
+    "Choices": ["1", "2", "3", "4"],
+    "Answer": "3"
+  },
+  {
+    "ID": "q5",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p1 = &a;\n    int **p2 = &p1;\n    printf(\"%d\\n\", **p2);\n    return 0;\n}",
+    "Choices": ["Address of a", "Address of p1", "10", "Compilation error"],
+    "Answer": "10"
+  },
+  {
+    "ID": "q6",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    int x = 5;\n    printf(\"%d\\n\", x++);\n    return 0;\n}",
+    "Choices": ["5", "6", "Compilation error", "Undefined behavior"],
+    "Answer": "5"
+  },
+  {
+    "ID": "q7",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    printf(\"%zu\\n\", sizeof(\"hello!\"));\n    return 0;\n}",
+    "Choices": ["5", "6", "7", "8"],
+    "Answer": "7"
+  },
+  {
+    "ID": "q8",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    char s1[] = \"world\";\n    char *s2 = \"world\";\n    if (s1 == s2) {\n        printf(\"Same\");\n    } else {\n        printf(\"Different\");\n    }\n    return 0;\n}",
+    "Choices": ["Same", "Different", "Compilation error", "Undefined behavior"],
+    "Answer": "Different"
+  },
+  {
+    "ID": "q9",
+    "Statement": "#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10, y = 20;\n    swap(&x, &y);\n    printf(\"%d %d\\n\", x, y);\n    return 0;\n}",
+    "Choices": ["10 20", "20 10", "10 10", "20 20"],
+    "Answer": "20 10"
+  },
+  {
+    "ID": "q10",
+    "Statement": "#include <stdio.h>\n\nint main() {\n    int i = 0;\n    int result = i++ + ++i;\n    printf(\"%d\\n\", result);\n    return 0;\n}",
+    "Choices": ["0", "1", "2", "Undefined behavior"],
+    "Answer": "Undefined behavior"
+  }
+]
