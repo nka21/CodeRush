@@ -120,12 +120,6 @@ func (h *RoomHub) unregisterClient(client *Client) {
 						close(otherClient.Send) // 各クライアントのSendチャネルを閉じると、WritePumpが終了し接続が切れる
 					}
 				}
-				// DBからルームを削除
-				delete(db.Rooms, roomID)
-				if err := h.DBHandler.WriteDB(db); err != nil {
-					log.Printf("error: failed to write DB after deleting room: %v", err)
-				}
-
 				delete(h.rooms, roomID)
 			} else if len(h.rooms[roomID]) == 0 {
 				delete(h.rooms, roomID)
@@ -140,8 +134,8 @@ func (h *RoomHub) unregisterClient(client *Client) {
 			}
 		}
 	}
+	}
 }
-
 
 func (h *RoomHub) broadcastMessage(message *types.Message) {
 	h.mu.RLock()
