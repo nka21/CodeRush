@@ -16,13 +16,14 @@ type QuizGameClientProps = {
   questions: Question[];
   onGameEnd?: () => void;
   roomId?: string;
+  currentParticipants?: number;
 };
 
 // ゲーム状態を詳細に管理
 type GamePhase = "playing" | "result" | "question_log";
 
 export const QuizGameClient = (props: QuizGameClientProps) => {
-  const { questions, onGameEnd, roomId } = props;
+  const { questions, onGameEnd, roomId, currentParticipants } = props;
   const router = useRouter();
 
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
@@ -213,7 +214,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
 
   // クイズプレイ画面
   return (
-    <TerminalLayout cli={commandText} onTypingComplete={handleTypingComplete}>
+    <TerminalLayout cli={commandText} onTypingComplete={handleTypingComplete} roomId={roomId} currentParticipants={currentParticipants}>
       <QuizTimerSection
         onTimeExpired={handleTimeExpired}
         isRunning={isTypingComplete && !hasAnswered && !isComplete}

@@ -108,6 +108,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
         questions={questions}
         onGameEnd={handleReturnToLobby}
         roomId={roomId}
+        currentParticipants={4}
       />
     );
   }
