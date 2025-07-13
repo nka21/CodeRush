@@ -24,6 +24,7 @@ type GameState struct {
 	AnsweredUsers    map[string]bool // この問題に回答済みのユーザー
 	QuestionNumber   int             // 現在が何問目か
 	IsQuestionActive bool            // 現在の問題が回答可能か
+	UsedQuestionIDs  []string        // 出題済み問題ID
 }
 
 // PlayerResult は最終結果のランキング表示に使用する構造体です。

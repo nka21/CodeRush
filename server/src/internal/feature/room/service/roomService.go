@@ -6,10 +6,10 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
-	"time"
-	"server/src/internal/feature/room/utils"
 	"server/src/internal/feature/room/repository"
 	"server/src/internal/feature/room/types"
+	"server/src/internal/feature/room/utils"
+	"time"
 )
 
 // QuizService はクイズ機能のビジネスロジックを担当します。
@@ -29,8 +29,12 @@ func (s *RoomService) CreateRoom(req *types.RoomCreationRequest) (*types.Room, e
 		roomID = generateRandomID()
 	}
 
-	// 本来は認証情報から取得するが、今回は仮のIDを使用
-	hostID := "user_" + generateRandomID()
+	// クライアントから送信されたhostIdを使用
+	hostID := req.HostID
+	if hostID == "" {
+		// フォールバック：hostIdが空の場合は生成
+		hostID = "user_" + generateRandomID()
+	}
 
 	newRoom := &types.Room{
 		RoomID:    roomID,
@@ -78,8 +82,12 @@ func (s *RoomService) JoinRoom(id string, req *types.JoinRequest) (*types.Room, 
 		return nil, errors.New("game has already started")
 	}
 
-	// 本来は認証情報から取得するが、今回は仮のIDを使用
-	playerID := "user_" + generateRandomID()
+	// クライアントから送信されたuserIdを使用
+	playerID := req.UserId
+	if playerID == "" {
+		// フォールバック：userIdが空の場合は生成
+		playerID = "user_" + generateRandomID()
+	}
 	if _, exists := room.Players[playerID]; exists {
 		return nil, errors.New("user already in room")
 	}

@@ -4,12 +4,6 @@ import { Button } from "@/components/Button";
 import type { QuizResult } from "../../_types/quiz";
 
 const rankIcons = "◆";
-const rankColors = [
-  "text-yellow-400 font-bold",
-  "text-gray-400 font-bold",
-  "text-yellow-700 font-bold",
-  "font-bold",
-];
 
 type QuizResultScreenProps = {
   result?: QuizResult;

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const TOTAL_QUESTIONS = 10
+const TOTAL_QUESTIONS = 2 // types.Questionの要素数
 
 type QuizService struct {
 	hub        *websocket.RoomHub
@@ -50,6 +50,7 @@ func (s *QuizService) StartGame(roomID string) error {
 		AnsweredUsers:    make(map[string]bool),
 		QuestionNumber:   0,
 		IsQuestionActive: false,
+		UsedQuestionIDs:  make([]string, 0), // 出題済み問題IDを初期化
 	}
 
 	s.gameStates[roomID] = newState
@@ -145,16 +146,30 @@ func (s *QuizService) nextQuestion(roomID string) {
 		return
 	}
 
-	// 10問終わったらゲーム終了
+	// 全問題が終わったらゲーム終了
+	log.Printf("Question check: current=%d, total=%d", state.QuestionNumber, TOTAL_QUESTIONS)
 	if state.QuestionNumber >= TOTAL_QUESTIONS {
+		log.Printf("Game ending: reached maximum questions (%d)", TOTAL_QUESTIONS)
 		s.endGame(roomID)
 		return
 	}
 
 	state.QuestionNumber++
-	state.CurrentQuestion = s.getRandomQuestion()
+	
+	// 重複を避けて問題を選択
+	nextQuestion := s.getNextUniqueQuestion(state.UsedQuestionIDs)
+	if nextQuestion == nil {
+		log.Printf("No more unique questions available, ending game")
+		s.endGame(roomID)
+		return
+	}
+	
+	state.CurrentQuestion = nextQuestion
+	state.UsedQuestionIDs = append(state.UsedQuestionIDs, nextQuestion.ID)
 	state.AnsweredUsers = make(map[string]bool)
 	state.IsQuestionActive = true // 回答受付開始
+
+	log.Printf("Question %d selected: %s (ID: %s)", state.QuestionNumber, nextQuestion.Statement, nextQuestion.ID)
 
 	message := &types.Message{
 		Type: "question_start",
@@ -214,7 +229,35 @@ func (s *QuizService) endGame(roomID string) {
 }
 
 
-// ... (getRandomQuestion, loadDummyQuestions は変更なし)
+// getNextUniqueQuestion は出題済みでない問題を返します。
+func (s *QuizService) getNextUniqueQuestion(usedIDs []string) *types.Question {
+	availableQuestions := make([]*types.Question, 0)
+	
+	for i := range s.questions {
+		question := &s.questions[i]
+		isUsed := false
+		
+		// 出題済みかどうかチェック
+		for _, usedID := range usedIDs {
+			if question.ID == usedID {
+				isUsed = true
+				break
+			}
+		}
+		
+		if !isUsed {
+			availableQuestions = append(availableQuestions, question)
+		}
+	}
+	
+	if len(availableQuestions) == 0 {
+		return nil // 出題可能な問題がない
+	}
+	
+	// 出題可能な問題からランダム選択
+	return availableQuestions[rand.Intn(len(availableQuestions))]
+}
+
 func (s *QuizService) getRandomQuestion() *types.Question {
 	if len(s.questions) == 0 {
 		return nil

@@ -17,6 +17,19 @@ export const JoinModal = memo((props: JoinModalProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // userIdを生成・管理
+  const [userId] = useState(() => {
+    // localStorageから取得、なければ新しく生成
+    const storedUserId = localStorage.getItem("currentUserId");
+    if (storedUserId) {
+      return storedUserId;
+    } else {
+      const newUserId = `user_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("currentUserId", newUserId);
+      return newUserId;
+    }
+  });
+
   /**
    * モーダルが閉じられたときに入力値をリセット
    */
@@ -40,7 +53,8 @@ export const JoinModal = memo((props: JoinModalProps) => {
 
     try {
       await joinRoomAndNavigate(roomId.trim(), {
-        playerName: "user_438e985574fe71edwdwdwdw",
+        userId: userId,
+        playerName: `Player_${userId.slice(-6)}`, // userIdの末尾6文字を使用
       });
       handleClose();
     } catch (error) {
@@ -49,7 +63,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [roomId, joinRoomAndNavigate, handleClose]);
+  }, [roomId, joinRoomAndNavigate, handleClose, userId]);
 
   /**
    * Enterキーでルーム参加
