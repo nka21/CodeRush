@@ -9,13 +9,12 @@ type CodeDisplayProps = {
 };
 
 export const CodeDisplay = memo((props: CodeDisplayProps) => {
-  const { code, question, questionNumber } = props;
+  const { code, question } = props;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
 
   // 表示するコンテンツを決定
   const displayContent = question || code || "";
-  const isQuestion = !!question;
 
   // スクロール可能かどうかをチェックする関数
   const checkScrollable = () => {
