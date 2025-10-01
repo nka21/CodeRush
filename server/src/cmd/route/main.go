@@ -39,9 +39,9 @@ func main() {
 
 	api := e.Group("/api")
 
-    api.GET("/", func(c echo.Context) error {
-        return c.String(200, "OK")
-    })
+	api.GET("/", func(c echo.Context) error {
+		return c.String(200, "OK")
+	})
 	room.RegisterRoutes(api.Group("/room"), db)
 	// quiz.RegisterRoutes に quizSvc を渡す
 	quiz.RegisterRoutes(api.Group("/quiz"), hub, quizSvc)

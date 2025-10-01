@@ -155,7 +155,7 @@ func (s *QuizService) nextQuestion(roomID string) {
 	}
 
 	state.QuestionNumber++
-	
+
 	// 重複を避けて問題を選択
 	nextQuestion := s.getNextUniqueQuestion(state.UsedQuestionIDs)
 	if nextQuestion == nil {
@@ -163,7 +163,7 @@ func (s *QuizService) nextQuestion(roomID string) {
 		s.endGame(roomID)
 		return
 	}
-	
+
 	state.CurrentQuestion = nextQuestion
 	state.UsedQuestionIDs = append(state.UsedQuestionIDs, nextQuestion.ID)
 	state.AnsweredUsers = make(map[string]bool)
@@ -228,15 +228,14 @@ func (s *QuizService) endGame(roomID string) {
 	log.Printf("Game ended in room %s", roomID)
 }
 
-
 // getNextUniqueQuestion は出題済みでない問題を返します。
 func (s *QuizService) getNextUniqueQuestion(usedIDs []string) *types.Question {
 	availableQuestions := make([]*types.Question, 0)
-	
+
 	for i := range s.questions {
 		question := &s.questions[i]
 		isUsed := false
-		
+
 		// 出題済みかどうかチェック
 		for _, usedID := range usedIDs {
 			if question.ID == usedID {
@@ -244,25 +243,18 @@ func (s *QuizService) getNextUniqueQuestion(usedIDs []string) *types.Question {
 				break
 			}
 		}
-		
+
 		if !isUsed {
 			availableQuestions = append(availableQuestions, question)
 		}
 	}
-	
+
 	if len(availableQuestions) == 0 {
 		return nil // 出題可能な問題がない
 	}
-	
+
 	// 出題可能な問題からランダム選択
 	return availableQuestions[rand.Intn(len(availableQuestions))]
-}
-
-func (s *QuizService) getRandomQuestion() *types.Question {
-	if len(s.questions) == 0 {
-		return nil
-	}
-	return &s.questions[rand.Intn(len(s.questions))]
 }
 
 func loadQuestions(filePath string) ([]types.Question, error) {

@@ -17,7 +17,6 @@ type Player struct {
 	IsReady bool   `json:"isReady" dynamodbav:"is_ready"`
 }
 
-
 // Room は個々のゲームルームの全情報
 type Room struct {
 	RoomID    string            `json:"roomId" dynamodbav:"room_id"`
@@ -27,7 +26,6 @@ type Room struct {
 	GameState string            `json:"gameState" dynamodbav:"game_state"`
 	CreatedAt time.Time         `json:"createdAt" dynamodbav:"created_at"`
 }
-
 
 // --- リクエスト/レスポンス用の構造体 ---
 

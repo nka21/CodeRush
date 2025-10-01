@@ -8,8 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	roomtypes "server/src/internal/feature/room/types"
 )
@@ -33,14 +33,11 @@ func NewDBConnection() (*DBHandler, error) {
 		tableName = "quiz" // デフォルト名
 	}
 
-	tableName = "quiz"
-
 	return &DBHandler{
 		client:    client,
 		tableName: tableName,
 	}, nil
 }
-
 
 // ルームを1件取得
 func (h *DBHandler) ReadDB(id string) (*roomtypes.Room, error) {
@@ -79,7 +76,6 @@ func (h *DBHandler) WriteDB(room *roomtypes.Room) error {
 	})
 	return err
 }
-
 
 func (h *DBHandler) DeleteRoom(roomID string) error {
 	_, err := h.client.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{

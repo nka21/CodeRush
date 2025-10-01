@@ -2,12 +2,12 @@
 package handler
 
 import (
+	ws "github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
 	"server/src/internal/feature/quiz/service"
 	"server/src/internal/feature/quiz/websocket"
-	ws "github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
 )
 
 var upgrader = ws.Upgrader{
