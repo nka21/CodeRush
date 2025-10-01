@@ -318,9 +318,10 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   );
 
   // 問題が変わったらタイピング状態をリセット
+  // biome-ignore lint/correctness/useExhaustiveDependencies: currentQuestionIndex triggers typing state reset on question change
   useEffect(() => {
     setIsTypingComplete(false);
-  }, []);
+  }, [currentQuestionIndex]);
 
   const commandText = `--question ${currentQuestionIndex + 1}`;
 
