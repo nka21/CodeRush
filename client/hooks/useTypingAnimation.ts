@@ -55,7 +55,7 @@ export const useTypingAnimation = (props: UseTypingAnimationProps) => {
         clearTimeout(completionTimeoutId);
       }
     };
-  }, [text, baseSpeed, delayAfterCompletion]);
+  }, [text]);
 
   return { displayedText, isComplete };
 };
