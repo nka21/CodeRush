@@ -1,7 +1,7 @@
 // Modal.tsx
 "use client";
 
-import { memo, useEffect, useRef, MouseEvent, useCallback } from "react";
+import { type MouseEvent, memo, useCallback, useEffect, useRef } from "react";
 
 type ModalProps = {
   isOpen: boolean;
@@ -42,8 +42,9 @@ export const Modal = memo((props: ModalProps) => {
       ref={dialogRef}
       className="min-h-screen w-full max-w-none bg-transparent p-0 backdrop:bg-black/50"
       onClose={onClose}
-      role="dialog"
     >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: Backdrop click should only work with mouse for better UX */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Backdrop div is intentionally interactive for modal closing */}
       <div
         onClick={handleBackdropClick}
         className="flex min-h-screen items-center justify-center p-4"

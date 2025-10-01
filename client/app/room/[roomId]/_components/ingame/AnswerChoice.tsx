@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { Button } from "@/components/Button";
 import { STYLE_CLASSES } from "../../_constants/quiz";
 

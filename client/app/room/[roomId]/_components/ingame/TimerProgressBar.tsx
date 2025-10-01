@@ -32,7 +32,7 @@ export const TimerProgressBar = memo((props: TimerProgressBarProps) => {
         const isFilled = index < filledBars;
         return (
           <span
-            key={index}
+            key={`bar-${index}`}
             className={`flex-1 ${colorClass} text-xs`}
             aria-hidden="true"
           >

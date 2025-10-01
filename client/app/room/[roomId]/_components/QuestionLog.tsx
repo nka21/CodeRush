@@ -4,11 +4,11 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 export const QuestionLog = () => {
   return (
     <div className="text-center">
-      <h1 className="font-sixtyfour my-5 text-4xl font-bold text-green-400 md:text-5xl">
+      <h1 className="my-5 font-bold font-sixtyfour text-4xl text-green-400 md:text-5xl">
         QUESTION LOG
       </h1>
 
-      <div className="my-4 border-t border-green-700" />
+      <div className="my-4 border-green-700 border-t" />
 
       <div className="max-h-96 space-y-4 overflow-y-auto">
         {[
@@ -90,7 +90,7 @@ export const QuestionLog = () => {
         ].map((q, index) => (
           <div key={q.id} className="rounded bg-black/60 p-5 text-left">
             <div className="mb-2 font-bold text-green-400">Question {q.id}</div>
-            <pre className="mb-3 overflow-x-auto text-sm text-gray-300">
+            <pre className="mb-3 overflow-x-auto text-gray-300 text-sm">
               <SyntaxHighlighter
                 language="c"
                 style={vscDarkPlus}
@@ -102,8 +102,8 @@ export const QuestionLog = () => {
             <div className="mb-2 grid grid-cols-2 gap-1">
               {q.choices.map((choice, idx) => (
                 <div
-                  key={idx}
-                  className="flex items-center gap-2 text-sm text-gray-400"
+                  key={`choice-${idx}-${choice.slice(0, 10)}`}
+                  className="flex items-center gap-2 text-gray-400 text-sm"
                 >
                   <span>{String.fromCharCode(65 + idx)}.</span>
                   <span>{choice}</span>
@@ -111,7 +111,7 @@ export const QuestionLog = () => {
               ))}
             </div>
             <div className="font-bold text-yellow-400">Answer: {q.answer}</div>
-            {index < 9 && <div className="border-t border-green-700" />}
+            {index < 9 && <div className="border-green-700 border-t" />}
           </div>
         ))}
       </div>

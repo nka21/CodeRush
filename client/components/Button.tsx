@@ -34,7 +34,7 @@ export const Button = memo((props: Props) => {
       )}
       <div className="flex flex-col items-start">
         <span className="text-lg text-white">{label}</span>
-        <p className="mt-1 text-sm text-gray-400">{description}</p>
+        <p className="mt-1 text-gray-400 text-sm">{description}</p>
       </div>
       {context !== "game" && (
         <span

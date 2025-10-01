@@ -46,14 +46,16 @@ export const useWebSocket = (): UseWebSocketReturn => {
         console.log("⚠️ サーバーエラー:", response.status);
         return false;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("❌ サーバーヘルスチェック失敗:", error);
 
       // ネットワークエラーの詳細分析
-      if (error.name === "AbortError") {
-        console.error("⏰ 接続タイムアウト（5秒）");
-      } else if (error.message?.includes("fetch")) {
-        console.error("🌐 ネットワーク接続に失敗");
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          console.error("⏰ 接続タイムアウト（5秒）");
+        } else if (error.message?.includes("fetch")) {
+          console.error("🌐 ネットワーク接続に失敗");
+        }
       }
 
       console.error("💡 確認事項:");
@@ -133,7 +135,7 @@ export const useWebSocket = (): UseWebSocketReturn => {
             !event.wasClean &&
             reconnectAttempts.current < maxReconnectAttempts
           ) {
-            const delay = Math.pow(2, reconnectAttempts.current) * 1000; // 指数バックオフ
+            const delay = 2 ** reconnectAttempts.current * 1000; // 指数バックオフ
             console.log(
               `🔄 ${delay}ms後に再接続を試行... (${reconnectAttempts.current + 1}/${maxReconnectAttempts})`,
             );
