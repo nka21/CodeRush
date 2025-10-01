@@ -20,6 +20,7 @@ export const QuizTimerSection = memo((props: QuizTimerSectionProps) => {
   });
 
   // 問題が変わったらタイマーリセット
+  // biome-ignore lint/correctness/useExhaustiveDependencies: currentQuestionIndex triggers timer reset on question change
   useEffect(() => {
     resetTimer();
   }, [currentQuestionIndex, resetTimer]);
