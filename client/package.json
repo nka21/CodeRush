@@ -6,8 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "lint": "biome check --write --unsafe",
+    "lint:check": "biome check",
+    "format": "biome format --write",
+    "format:check": "biome format"
   },
   "dependencies": {
     "next": "15.3.5",
