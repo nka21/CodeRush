@@ -122,7 +122,8 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         } = message.payload;
 
         // 回答者が自分でない場合は、先に回答されたとして処理
-        if (answeredUserId !== userId && !quizResult && userId) { // gamePhaseの代わりにquizResultで判定
+        if (answeredUserId !== userId && !quizResult && userId) {
+          // gamePhaseの代わりにquizResultで判定
           // 正解の選択肢インデックスを見つける
           const correctIndex =
             currentQuestion?.choices.findIndex(
@@ -198,7 +199,15 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
         }
         break;
     }
-  }, [lastMessage, userId, handleQuizComplete, quizResult, currentQuestion, currentQuestionIndex, score]);
+  }, [
+    lastMessage,
+    userId,
+    handleQuizComplete,
+    quizResult,
+    currentQuestion,
+    currentQuestionIndex,
+    score,
+  ]);
 
   // QuestionLogに移行する関数
   const handleShowQuestionLog = useCallback(() => {

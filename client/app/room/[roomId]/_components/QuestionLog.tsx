@@ -99,9 +99,12 @@ export const QuestionLog = () => {
                 {q.code}
               </SyntaxHighlighter>
             </pre>
-            <div className="grid grid-cols-2 gap-1 mb-2">
+            <div className="mb-2 grid grid-cols-2 gap-1">
               {q.choices.map((choice, idx) => (
-                <div key={idx} className="text-sm text-gray-400 flex items-center gap-2">
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 text-sm text-gray-400"
+                >
                   <span>{String.fromCharCode(65 + idx)}.</span>
                   <span>{choice}</span>
                 </div>
