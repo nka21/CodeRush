@@ -320,7 +320,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   // 問題が変わったらタイピング状態をリセット
   useEffect(() => {
     setIsTypingComplete(false);
-  }, [currentQuestionIndex]);
+  }, []);
 
   const commandText = `--question ${currentQuestionIndex + 1}`;
 
