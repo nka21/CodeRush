@@ -75,7 +75,6 @@ func (h *RoomHub) registerClient(client *Client) {
 	}()
 }
 
-
 func (h *RoomHub) unregisterClient(client *Client) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -88,7 +87,7 @@ func (h *RoomHub) unregisterClient(client *Client) {
 		return
 	}
 
-	var isHost bool = false
+	isHost := false
 	if roomData != nil {
 		hostPlayer, hostPlayerExists := roomData.Players[roomData.HostID]
 		if hostPlayerExists && hostPlayer.Name == userID {
@@ -115,25 +114,25 @@ func (h *RoomHub) unregisterClient(client *Client) {
 				// DynamoDB から削除
 				if err := h.DBHandler.DeleteRoom(roomID); err != nil {
 					log.Printf("error: failed to delete room from DB: %v", err)
-				for otherClient := range room {
-					if otherClient != client { // 自分自身（ホスト）は除く
-						close(otherClient.Send) // 各クライアントのSendチャネルを閉じると、WritePumpが終了し接続が切れる
+					for otherClient := range room {
+						if otherClient != client { // 自分自身（ホスト）は除く
+							close(otherClient.Send) // 各クライアントのSendチャネルを閉じると、WritePumpが終了し接続が切れる
+						}
 					}
+					delete(h.rooms, roomID)
+				} else if len(h.rooms[roomID]) == 0 {
+					delete(h.rooms, roomID)
+					log.Printf("Room %s closed", roomID)
+				} else {
+					leaveMsg := &types.Message{
+						Type:    "user_left",
+						Payload: map[string]string{"userId": userID},
+						RoomID:  roomID,
+					}
+					go h.broadcastMessage(leaveMsg)
 				}
-				delete(h.rooms, roomID)
-			} else if len(h.rooms[roomID]) == 0 {
-				delete(h.rooms, roomID)
-				log.Printf("Room %s closed", roomID)
-			} else {
-				leaveMsg := &types.Message{
-					Type:    "user_left",
-					Payload: map[string]string{"userId": userID},
-					RoomID:  roomID,
-				}
-				go h.broadcastMessage(leaveMsg)
 			}
 		}
-	}
 	}
 }
 

@@ -6,7 +6,7 @@ type Message struct {
 	Type    string      `json:"type"`
 	Payload interface{} `json:"payload,omitempty"`
 	// RoomID はJSONには含めず、ハブ内部でのルーティングに使用します。
-	RoomID  string      `json:"-"`
+	RoomID string `json:"-"`
 }
 
 // Question は1つのクイズ問題を表す構造体です。
@@ -29,8 +29,8 @@ type GameState struct {
 
 // PlayerResult は最終結果のランキング表示に使用する構造体です。
 type PlayerResult struct {
-	UserID   string `json:"userId"`
+	UserID string `json:"userId"`
 	// Name     string `json:"name"` // 必要であればユーザー名も追加
-	Score    int    `json:"score"`
-	Rank     int    `json:"rank"`
+	Score int `json:"score"`
+	Rank  int `json:"rank"`
 }
