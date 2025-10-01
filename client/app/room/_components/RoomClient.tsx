@@ -1,11 +1,11 @@
 "use client";
 
-import { TerminalLayout } from "@/components/TerminalLayout";
-import { Button } from "@/components/Button";
-import { memo, useState, useCallback, useEffect } from "react";
-import { QuizGameClient } from "../[roomId]/_components/ingame/QuizGameClient";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { memo, useCallback, useEffect, useState } from "react";
 import type { ServerMessage } from "@/app/_types/api";
+import { Button } from "@/components/Button";
+import { TerminalLayout } from "@/components/TerminalLayout";
+import { useWebSocket } from "@/hooks/useWebSocket";
+import { QuizGameClient } from "../[roomId]/_components/ingame/QuizGameClient";
 
 type Player = {
   id: string;
@@ -39,9 +39,9 @@ const PlayerCard = memo((props: { player: Player }) => {
       {/* プレイヤー情報 */}
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-white">{player.name}</div>
+          <div className="font-medium text-sm text-white">{player.name}</div>
           {player.isHost && (
-            <span className="rounded-sm border border-orange-500/30 bg-orange-500/20 px-2 py-0.5 text-xs font-medium text-orange-400">
+            <span className="rounded-sm border border-orange-500/30 bg-orange-500/20 px-2 py-0.5 font-medium text-orange-400 text-xs">
               HOST
             </span>
           )}
@@ -57,8 +57,8 @@ const PlayerCard = memo((props: { player: Player }) => {
  */
 const EmptySlot = memo(() => {
   return (
-    <div className="flex min-h-[60px] items-center justify-center rounded-md border border-dashed border-gray-600/30 bg-gray-800/20 p-3">
-      <span className="text-xs text-gray-500" />
+    <div className="flex min-h-[60px] items-center justify-center rounded-md border border-gray-600/30 border-dashed bg-gray-800/20 p-3">
+      <span className="text-gray-500 text-xs" />
     </div>
   );
 });
@@ -325,7 +325,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
               </span>
             </div>
             {connectionStatus === "error" && (
-              <div className="mt-2 text-xs text-red-400">
+              <div className="mt-2 text-red-400 text-xs">
                 サーバーに接続できません。サーバーが起動しているか確認してください。
               </div>
             )}
@@ -380,7 +380,7 @@ export const RoomClient = memo((props: RoomClientProps) => {
 
           {/* 空きスロットを表示 */}
           {Array.from({ length: emptySlots }, (_, index) => (
-            <EmptySlot key={`empty-${index}`} />
+            <EmptySlot key={`empty-slot-${emptySlots}-${index}`} />
           ))}
         </div>
       </div>

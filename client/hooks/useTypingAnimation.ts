@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type UseTypingAnimationProps = {
   text: string;
@@ -55,7 +55,7 @@ export const useTypingAnimation = (props: UseTypingAnimationProps) => {
         clearTimeout(completionTimeoutId);
       }
     };
-  }, [text]);
+  }, [text, baseSpeed, delayAfterCompletion]);
 
   return { displayedText, isComplete };
 };

@@ -1,10 +1,10 @@
-import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import {
-  JoinRoomRequestSchema,
-  RoomSchema,
   type JoinRoomRequest,
+  JoinRoomRequestSchema,
   type JoinRoomResponse,
+  RoomSchema,
 } from "@/app/_types/api";
 import { apiPost } from "@/app/_utils/api";
 

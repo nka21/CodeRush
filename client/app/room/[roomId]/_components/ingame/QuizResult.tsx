@@ -1,4 +1,3 @@
-import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import type { QuizResult } from "../../_types/quiz";
@@ -28,11 +27,11 @@ export const QuizResultScreen = (props: QuizResultScreenProps) => {
 
   return (
     <div className="text-center">
-      <h1 className="font-sixtyfour typing-text my-5 text-4xl font-bold text-green-400 md:text-5xl">
+      <h1 className="typing-text my-5 font-bold font-sixtyfour text-4xl text-green-400 md:text-5xl">
         {isWinner ? "WIN" : "GAME OVER"}
       </h1>
 
-      <div className="my-4 border-t border-green-700" />
+      <div className="my-4 border-green-700 border-t" />
       <div className="font-bold text-green-400">FINAL RESULT</div>
       <pre className="mb-3 rounded bg-black/60 p-4">
         <div className="flex items-center gap-2 py-1 text-green-400">

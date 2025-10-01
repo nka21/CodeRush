@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 import { useQuizTimer } from "@/hooks/useQuizTimer";
 import { TimerProgressBar } from "./TimerProgressBar";
 
@@ -12,7 +12,7 @@ type QuizTimerSectionProps = {
 };
 
 export const QuizTimerSection = memo((props: QuizTimerSectionProps) => {
-  const { onTimeExpired, isRunning, currentQuestionIndex, score } = props;
+  const { onTimeExpired, isRunning, score } = props;
 
   const { progress, resetTimer } = useQuizTimer({
     onTimeExpired,
@@ -22,12 +22,12 @@ export const QuizTimerSection = memo((props: QuizTimerSectionProps) => {
   // 問題が変わったらタイマーリセット
   useEffect(() => {
     resetTimer();
-  }, [currentQuestionIndex, resetTimer]);
+  }, [resetTimer]);
 
   return (
     <div className="my-4 flex items-center justify-between gap-2">
       <TimerProgressBar progress={progress} />
-      <span className="font-mono text-xs text-white">Score: {score}</span>
+      <span className="font-mono text-white text-xs">Score: {score}</span>
     </div>
   );
 });

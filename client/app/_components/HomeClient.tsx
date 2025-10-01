@@ -70,13 +70,13 @@ export const HomeClient = () => {
   return (
     <>
       <div className="mb-2 flex items-center">
-        <span className="mr-2 text-green-400" aria-label="出力">
+        <span className="mr-2 text-green-400" aria-hidden="true">
           &gt;
         </span>
         <span className="text-white">早押しコードリーディング対決</span>
       </div>
 
-      <nav className="mt-8 flex flex-col gap-4" role="menu">
+      <nav className="mt-8 flex flex-col gap-4">
         <Button
           context="home"
           onClick={handleDisplayMakeModal}

@@ -1,4 +1,4 @@
-import { memo, useRef, useState, useEffect } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -17,14 +17,14 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
   const displayContent = question || code || "";
 
   // スクロール可能かどうかをチェックする関数
-  const checkScrollable = () => {
+  const checkScrollable = useCallback(() => {
     if (scrollRef.current) {
       const { scrollHeight, clientHeight, scrollTop } = scrollRef.current;
       const isScrollable = scrollHeight > clientHeight;
       const isNotAtBottom = scrollTop < scrollHeight - clientHeight - 5; // 5pxの余裕
       setShowBottomShadow(isScrollable && isNotAtBottom);
     }
-  };
+  }, []);
 
   useEffect(() => {
     checkScrollable();
@@ -40,7 +40,7 @@ export const CodeDisplay = memo((props: CodeDisplayProps) => {
         window.removeEventListener("resize", checkScrollable);
       };
     }
-  }, [displayContent]);
+  }, [checkScrollable]);
 
   return (
     <div className="relative mb-8">

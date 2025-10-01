@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useCallback, useState, useEffect } from "react";
-import { Modal } from "./Modal";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useJoinRoom } from "@/hooks/api/useJoinRoom";
+import { Modal } from "./Modal";
 
 type JoinModalProps = {
   isOpen: boolean;
@@ -111,12 +111,12 @@ export const JoinModal = memo((props: JoinModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="w-full max-w-md rounded-lg border border-green-400/20 bg-black/90 p-6">
-        <h2 className="font-cascadia mb-4 text-xl text-white">JOIN_ROOM</h2>
+        <h2 className="mb-4 font-cascadia text-white text-xl">JOIN_ROOM</h2>
 
         <div className="mb-4">
           <label
             htmlFor="roomId"
-            className="mb-2 block text-sm font-medium text-gray-300"
+            className="mb-2 block font-medium text-gray-300 text-sm"
           >
             ルームID
           </label>
@@ -126,7 +126,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
             value={roomId}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="w-full rounded-md border border-green-400/30 bg-black/50 px-3 py-2 text-white focus:border-green-400/50 focus:ring-2 focus:ring-green-400/50 focus:outline-none"
+            className="w-full rounded-md border border-green-400/30 bg-black/50 px-3 py-2 text-white focus:border-green-400/50 focus:outline-none focus:ring-2 focus:ring-green-400/50"
             placeholder="ルームIDを入力してください"
             disabled={isLoading}
           />
@@ -140,6 +140,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -148,7 +149,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="text-sm text-red-400">{errorMessage}</span>
+                <span className="text-red-400 text-sm">{errorMessage}</span>
               </div>
             </div>
           )}
@@ -156,6 +157,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
 
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={handleClose}
             disabled={isLoading}
             className="flex-1 cursor-pointer rounded-md border border-gray-400/30 bg-gray-500/20 px-4 py-2 text-gray-400 transition-colors hover:border-gray-400/50 hover:bg-gray-500/30 disabled:cursor-not-allowed disabled:opacity-50"
@@ -163,6 +165,7 @@ export const JoinModal = memo((props: JoinModalProps) => {
             キャンセル
           </button>
           <button
+            type="button"
             onClick={handleJoinRoom}
             disabled={isJoinButtonDisabled}
             className={`flex-1 rounded-md border px-4 py-2 transition-colors ${

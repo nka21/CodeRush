@@ -1,22 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TerminalLayout } from "@/components/TerminalLayout";
-import { QuizTimerSection } from "./QuizTimerSection";
-import { CodeDisplay } from "./CodeDisplay";
-import { AnswerChoice } from "./AnswerChoice";
-import { QuizResultScreen } from "./QuizResult";
-import { QuestionLog } from "../QuestionLog";
+import { useCallback, useEffect, useState } from "react";
+import type { ClientMessage, ServerMessage } from "@/app/_types/api";
 import { Button } from "@/components/Button";
+import { TerminalLayout } from "@/components/TerminalLayout";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { ANIMATION } from "../../_constants/quiz";
 import type {
-  QuizResult,
   AnswerState,
+  QuizResult,
   WebSocketQuestion,
 } from "../../_types/quiz";
-import type { ClientMessage, ServerMessage } from "@/app/_types/api";
-import { ANIMATION } from "../../_constants/quiz";
+import { QuestionLog } from "../QuestionLog";
+import { AnswerChoice } from "./AnswerChoice";
+import { CodeDisplay } from "./CodeDisplay";
+import { QuizResultScreen } from "./QuizResult";
+import { QuizTimerSection } from "./QuizTimerSection";
 
 type QuizGameClientProps = {
   onGameEnd?: () => void;
@@ -114,7 +114,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           setCorrectAnswer(""); // 正解をリセット
         }
         break;
-      case "answer_result":
+      case "answer_result": {
         const {
           userId: answeredUserId,
           correctAnswer,
@@ -126,9 +126,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           // gamePhaseの代わりにquizResultで判定
           // 正解の選択肢インデックスを見つける
           const correctIndex =
-            currentQuestion?.choices.findIndex(
-              (choice) => choice === correctAnswer,
-            ) ?? -1;
+            currentQuestion?.choices.indexOf(correctAnswer) ?? -1;
 
           if (correctIndex !== -1) {
             setAnswerState({
@@ -147,7 +145,8 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           setScore(scores[userId]);
         }
         break;
-      case "game_over":
+      }
+      case "game_over": {
         // 実際の問題数を設定（最後の問題番号から推定）
         const actualTotalQuestions = currentQuestionIndex + 1;
         setTotalQuestions(actualTotalQuestions);
@@ -198,6 +197,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           handleQuizComplete(result);
         }
         break;
+      }
     }
   }, [
     lastMessage,
@@ -294,9 +294,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
       if (!hasAnswered || !currentQuestion) return "default";
 
       // 正解の選択肢インデックスを見つける
-      const correctIndex = currentQuestion.choices.findIndex(
-        (choice) => choice === correctAnswer,
-      );
+      const correctIndex = currentQuestion.choices.indexOf(correctAnswer);
       const isCorrect = choiceIndex === correctIndex;
 
       if (answerState.type === "time_expired") {
@@ -322,7 +320,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
   // 問題が変わったらタイピング状態をリセット
   useEffect(() => {
     setIsTypingComplete(false);
-  }, [currentQuestionIndex]);
+  }, []);
 
   const commandText = `--question ${currentQuestionIndex + 1}`;
 
@@ -331,7 +329,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (hasAnswered || isComplete) return;
 
-      const keyNumber = parseInt(event.key);
+      const keyNumber = parseInt(event.key, 10);
       if (keyNumber >= 1 && keyNumber <= 4) {
         submitAnswer(keyNumber - 1);
       }
@@ -410,7 +408,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           />
 
           <div className="mb-4 flex items-center">
-            <span className="mr-2 text-green-400" aria-label="出力">
+            <span className="mr-2 text-green-400" aria-hidden="true">
               &gt;
             </span>
             <span className="text-white">
@@ -427,7 +425,7 @@ export const QuizGameClient = (props: QuizGameClientProps) => {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {currentQuestion.choices.map((choice, index) => (
               <AnswerChoice
-                key={index}
+                key={`${index}-${choice.slice(0, 15)}`}
                 choice={choice}
                 index={index}
                 status={getAnswerChoiceStatus(index)}
