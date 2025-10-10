@@ -3,12 +3,19 @@ name: Client CI
 on:
   pull_request:
     paths:
-      - 'client/**'
-      - '.github/workflows/client-ci.yml'
+      - "client/**"
+      - ".github/workflows/frontend-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  NODE_VERSION: '22'
-  PNPM_VERSION: '10.12.4'
+  NODE_VERSION: "22"
+  PNPM_VERSION: "10.12.4"
 
 defaults:
   run:
@@ -17,6 +24,7 @@ defaults:
 jobs:
   lint-and-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout code
@@ -31,7 +39,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
           cache-dependency-path: client/pnpm-lock.yaml
 
       - name: Install dependencies
